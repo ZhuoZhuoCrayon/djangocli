@@ -2,10 +2,10 @@
 .idea/
 .tmp/
 .vscode/
+db.sqlite3
 
 ## Python Part
 
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
