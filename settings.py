@@ -3,12 +3,21 @@
 import os
 from pathlib import Path
 
+import dotenv
+
 
 class EnvType:
     DEV = "dev"
     PROD = "prod"
     STAG = "stag"
 
+
+# 对于本地开发环境，通过建立dc_dev.env文件，可以在启动时便导入环境变量，解决envfile不支持在Pycharm Terminal / Python Console
+# 中导入环境变量的问题，当然也可以将env/script的脚本分别加入到PyCharm的启用脚本（Terminal仍不支持前置命令；）
+# 为防止信息泄漏，禁止生产环境通过push .env文件到源码
+dev_env_file_path = f"{Path(__file__).resolve().parent}/env/dc_dev.env"
+if os.path.exists(dev_env_file_path):
+    dotenv.load_dotenv(dotenv_path=dev_env_file_path)
 
 ENV = os.getenv("DJANGO_CLI_ENV", EnvType.DEV)
 

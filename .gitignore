@@ -9,3 +9,7 @@ db.sqlite3
 __pycache__/
 *.py[cod]
 *$py.class
+
+
+## Settings
+env/dc_*.env
