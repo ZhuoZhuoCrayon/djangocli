@@ -3,7 +3,7 @@ import sys
 import dotenv
 
 # 打印系统信息
-print('Python %s on %s' % (sys.version, sys.platform))
+print("Python %s on %s" % (sys.version, sys.platform))
 
 sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])
 
