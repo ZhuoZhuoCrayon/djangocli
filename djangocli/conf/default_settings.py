@@ -25,6 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+APP_NAME = os.getenv("APP_NAME")
+
+APP_VERSION = os.getenv("APP_VERSION")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -78,8 +82,35 @@ WSGI_APPLICATION = "wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": APP_NAME,
+        "USER": os.getenv("DC_MYSQL_NAME", "root"),
+        "PASSWORD": os.getenv("DC_MYSQL_PASSWORD", ""),
+        "HOST": os.getenv("DC_MYSQL_HOST", "localhost"),
+        "PORT": os.getenv("DC_MYSQL_PORT", 3306),
+        "TEST": {
+            "NAME": f"{APP_NAME}_test",
+            "CHARSET": "utf8mb4",
+            "COLLATION": "utf8mb4_unicode_ci",
+        },
+    }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{host}:{port}/{user}".format(
+            host=os.getenv("DC_REDIS_HOST", "localhost"),
+            port=os.getenv("DC_REDIS_PORT", 6379),
+            user=f"{APP_NAME.lower()}:redis",
+        ),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": os.getenv("DC_REDIS_PASSWORD", ""),
+            # 最大连接数量
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100},
+        },
+        "KEY_FUNCTION": "djangocli.utils.redis.django_cache_key_maker",
     }
 }
 
