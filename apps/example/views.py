@@ -1,5 +1,5 @@
-from djangocli.utils.drf import DjangoCliModelViewSet
 from apps.example import models, serializers
+from djangocli.utils.drf.view import DjangoCliModelViewSet
 
 # Create your views here.
 
