@@ -9,7 +9,7 @@ REST_FRAMEWORK = {
     # "DEFAULT_AUTHENTICATION_CLASSES": (
     #     "rest_framework.authentication.BasicAuthentication",
     #     "rest_framework.authentication.SessionAuthentication",
-    #     # 'rest_framework.authentication.TokenAuthentication',
+    #     'rest_framework.authentication.TokenAuthentication',
     # ),
     # "DEFAULT_RENDERER_CLASSES": (
     #     # 自定义渲染器
@@ -17,5 +17,6 @@ REST_FRAMEWORK = {
     #     "rest_framework.renderers.JSONRenderer",
     # ),
     # "EXCEPTION_HANDLER": "apps.utils.drf.custom_exception_handler",
-    # "DEFAULT_PAGINATION_CLASS": "apps.utils.drf.PageNumberPagination",
+    # djangocli.utils.drf.view.DjangoCliGenericViewSet 中亦可指定分页器
+    "DEFAULT_PAGINATION_CLASS": "djangocli.utils.drf.filter.DjangoCliPageNumberPagination",
 }
