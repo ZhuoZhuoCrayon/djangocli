@@ -18,7 +18,7 @@ class Book(models.Model):
     # 属性
     name = models.CharField(verbose_name=_("书名"), max_length=128)
     ISBN = models.CharField(verbose_name=_("ISBN"), max_length=64)
-    publication_date = models.DateTimeField(verbose_name=_("出版日期"))
+    publication_date = models.DateField(verbose_name=_("出版日期"))
     package_type = models.IntegerField(verbose_name=_("包装类型"), choices=PACKAGE_TYPE_CHOICES)
 
     # 关联
