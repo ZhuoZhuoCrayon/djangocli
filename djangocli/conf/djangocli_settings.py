@@ -21,7 +21,10 @@ REST_FRAMEWORK = {
     #     # "apps.utils.drf.CustomJsonRender",
     #     "rest_framework.renderers.JSONRenderer",
     # ),
-    # "EXCEPTION_HANDLER": "apps.utils.drf.custom_exception_handler",
+    "EXCEPTION_HANDLER": "djangocli.utils.drf.view.django_cli_exception_handler",
     # djangocli.utils.drf.view.DjangoCliGenericViewSet 中亦可指定分页器
     "DEFAULT_PAGINATION_CLASS": "djangocli.utils.drf.filter.DjangoCliPageNumberPagination",
 }
+
+
+ALLOWED_HOSTS = ["*"]

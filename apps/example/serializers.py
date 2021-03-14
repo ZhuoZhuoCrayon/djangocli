@@ -32,3 +32,23 @@ class ExampleBookSearchRequestSerializer(filter.PageSerializer):
 class ExampleBookSearchResponseSerializer(serializers.Serializer):
     class Meta:
         swagger_schema_fields = {"example": mock_data.API_EXAMPLE_BOOK_SEARCH.response_data}
+
+
+class ExampleCommonExceptionRequestSerializer(serializers.Serializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_EXCEPTION.request_data}
+
+
+class ExampleCommonExceptionResponseSerializer(serializers.Serializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_EXCEPTION.response_data}
+
+
+class ExampleCommonUnExceptionRequestSerializer(serializers.Serializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_UN_EXCEPTION.request_data}
+
+
+class ExampleCommonUnExceptionResponseSerializer(serializers.Serializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_UN_EXCEPTION.response_data}
