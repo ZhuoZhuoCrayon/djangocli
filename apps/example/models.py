@@ -34,7 +34,7 @@ class Book(models.Model):
     class Meta:
         verbose_name = _("书籍")
         verbose_name_plural = _("书籍")
-        # ordering = ["-id"]
+        ordering = ["id"]
 
 
 class Publisher(models.Model):
@@ -51,7 +51,7 @@ class Publisher(models.Model):
     class Meta:
         verbose_name = _("出版社")
         verbose_name_plural = _("出版社")
-        # ordering = ["-id"]
+        ordering = ["id"]
 
 
 class Author(models.Model):
@@ -67,4 +67,4 @@ class Author(models.Model):
     class Meta:
         verbose_name = _("作者")
         verbose_name_plural = _("作者")
-        # ordering = ["-id"]
+        ordering = ["id"]

@@ -1,3 +1,8 @@
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
+
 from apps.example import models, serializers
 from djangocli.utils.drf.view import DjangoCliModelViewSet
 
@@ -10,6 +15,16 @@ class ExampleBookViews(DjangoCliModelViewSet):
 
     def get_queryset(self):
         return self.model.objects.all()
+
+    @swagger_auto_schema(
+        operation_summary="查询书籍",
+        tags=["book"],
+        request_body=serializers.ExampleBookSearchRequestSerializer(),
+        responses={status.HTTP_200_OK: serializers.ExampleBookSearchResponseSerializer()},
+    )
+    @action(methods=["POST"], detail=False, serializer_class=serializers.ExampleBookSearchRequestSerializer)
+    def search(self, request, *args, **kwargs):
+        return Response({})
 
 
 class ExampleAuthorViews(DjangoCliModelViewSet):

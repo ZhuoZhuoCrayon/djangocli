@@ -2,7 +2,12 @@
 
 from djangocli.conf.default_settings import *  # noqa
 
-INSTALLED_APPS.extend(["rest_framework"])
+INSTALLED_APPS.extend(
+    [
+        "rest_framework",
+        "drf_yasg",  # swagger's support
+    ]
+)
 
 REST_FRAMEWORK = {
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",

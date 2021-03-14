@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
+from djangocli.utils.drf import filter
 from apps.example import models
+from apps.example.tests import mock_data
 
 
 class ExampleBookModelSerializer(serializers.ModelSerializer):
@@ -20,3 +22,13 @@ class ExamplePublisherModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Publisher
         fields = "__all__"
+
+
+class ExampleBookSearchRequestSerializer(filter.PageSerializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_BOOK_SEARCH.request_data}
+
+
+class ExampleBookSearchResponseSerializer(serializers.Serializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_BOOK_SEARCH.response_data}
