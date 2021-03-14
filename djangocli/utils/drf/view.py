@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db.models.query import QuerySet
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
@@ -12,6 +13,10 @@ class DjangoCliGenericViewSet(GenericViewSet):
 
     # 认证
     authentication_classes = (BasicAuthentication, CsrfExemptSessionAuthentication)
+
+    def get_filter_queryset(self) -> QuerySet:
+        """获取筛选后的queryset"""
+        return self.filter_queryset(self.get_queryset())
 
 
 class DjangoCliModelViewSet(DjangoCliGenericViewSet, ModelViewSet):
