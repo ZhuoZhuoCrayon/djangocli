@@ -52,3 +52,13 @@ class ExampleCommonUnExceptionRequestSerializer(serializers.Serializer):
 class ExampleCommonUnExceptionResponseSerializer(serializers.Serializer):
     class Meta:
         swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_UN_EXCEPTION.response_data}
+
+
+class ExampleCommonValidateExceptionRequestSerializer(filter.PageSerializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_VALIDATE_EXCEPTION.request_data}
+
+
+class ExampleCommonValidateExceptionResponseSerializer(serializers.Serializer):
+    class Meta:
+        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_VALIDATE_EXCEPTION.response_data}

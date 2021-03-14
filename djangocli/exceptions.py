@@ -6,9 +6,6 @@ from rest_framework import status, exceptions
 from django.utils.translation import ugettext_lazy as _
 
 
-SUCCESS_CODE = "0"
-
-
 class ModuleErrorCode:
     SYSTEM = "DC:-1"
     DJANGO_CLI = "DC:00"

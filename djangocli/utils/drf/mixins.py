@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import traceback
+from collections import OrderedDict
 
 from django.http import Http404
 from rest_framework import status
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 
 from djangocli import exceptions
+from djangocli.utils.drf import base
 
 
 class ViewSetExceptionHandlerMixin:
@@ -67,12 +69,31 @@ class ViewSetResponseMixin:
     def finalize_response(self, request, response, *args, **kwargs):
         """统一接口返回格式"""
         if isinstance(response, Response):
-            response.data = {
-                "result": not response.exception,
-                "data": response.data or {},
-                "code": getattr(response, "code", exceptions.SUCCESS_CODE),
-                "message": getattr(response, "message", "") if response.exception else "success",
-            }
+            response.data = base.build_response_dict(
+                result=not response.exception,
+                data=response.data or {},
+                code=getattr(response, "code", base.SUCCESS_CODE),
+                message=getattr(response, "message", "") if response.exception else base.SUCCESS_MSG,
+            )
             response.status_code = status.HTTP_200_OK
 
         return super().finalize_response(request, response, *args, **kwargs)
+
+
+class ViewSetValidationMixin:
+    @property
+    def query_data(self) -> OrderedDict:
+        _query_data = getattr(self, "_query_data", None)
+
+        if _query_data:
+            return _query_data
+
+        original_data = self.request.query_params if self.request.method == "GET" else self.request.data
+
+        serializer_class = self.serializer_class or self.get_serializer_class()
+
+        serializer_inst = serializer_class(data=original_data)
+        serializer_inst.is_valid(raise_exception=True)
+
+        self.__query_data = serializer_inst.data
+        return self.__query_data
