@@ -5,11 +5,13 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from djangocli import exceptions
-from djangocli.utils.drf import filter, mixins
+from djangocli.utils.drf import filter, mixins, base
 from djangocli.utils.drf.auth import CsrfExemptSessionAuthentication
 
 
-class DjangoCliGenericViewSetHandler(mixins.ViewSetExceptionHandlerMixin, mixins.ViewSetResponseMixin, GenericViewSet):
+class DjangoCliGenericViewSetHandler(
+    mixins.ViewSetExceptionHandlerMixin, mixins.ViewSetValidationMixin, mixins.ViewSetResponseMixin, GenericViewSet
+):
     # 设置默认分页器
     pagination_class = filter.DjangoCliPageNumberPagination
 
@@ -28,15 +30,8 @@ class DjangoCliModelViewSet(DjangoCliGenericViewSetHandler, ModelViewSet):
 def django_cli_exception_handler(exc: exceptions.DjangoCliBaseException, context):
     """统一异常返回"""
 
-    def build_response(code=0, message="", data=None, errors=None) -> JsonResponse:
+    def build_response(code: str, message="", data=None, errors=None) -> JsonResponse:
         data = data or {}
-        return JsonResponse(
-            {
-                "result": False,
-                "code": code,
-                "data": data,
-                "message": message,
-            }
-        )
+        return JsonResponse(base.build_response_dict(result=False, code=code, message=message, data=data))
 
     return build_response(code=exc.code, message=exc.message, data=exc.data, errors=exc.errors)

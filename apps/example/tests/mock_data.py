@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from rest_framework import status
+
 from apps.example import exceptions as apps_example_exceptions
 from djangocli import exceptions as dc_exceptions
 from djangocli.utils.unittest.base import ApiMockData
@@ -38,9 +40,20 @@ API_EXAMPLE_COMMON_UN_EXCEPTION = ApiMockData(
     request_data={},
     response_data={
         "result": False,
-        "code": f"{dc_exceptions.DjangoCliSystemBaseException.MODULE_CODE}-"
+        "code": f"{dc_exceptions.ModuleErrorCode.SYSTEM}-"
         f"{dc_exceptions.DjangoCliSystemBaseException.FUNCTION_ERROR_CODE}",
         "data": {},
         "message": "别慌，系统暂时出了点小问题，请联系管理员排查（<class 'TypeError'>('User' object is not subscriptable)）",
+    },
+)
+
+
+API_EXAMPLE_COMMON_VALIDATE_EXCEPTION = ApiMockData(
+    request_data={},
+    response_data={
+        "result": False,
+        "code": f"{dc_exceptions.ModuleErrorCode.REST}-{status.HTTP_400_BAD_REQUEST}",
+        "data": {"page": ["该字段是必填项。"], "page_size": ["该字段是必填项。"]},
+        "message": "invalid (Details: Invalid input.)",
     },
 )

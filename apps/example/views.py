@@ -25,7 +25,8 @@ class ExampleBookViews(DjangoCliModelViewSet):
     )
     @action(methods=["POST"], detail=False, serializer_class=serializers.ExampleBookSearchRequestSerializer)
     def search(self, request, *args, **kwargs):
-        return Response({})
+
+        return Response({"query_data": self.query_data, "list": self.get_queryset().values()})
 
 
 class ExampleAuthorViews(DjangoCliModelViewSet):
@@ -64,3 +65,15 @@ class ExampleCommonViews(DjangoCliGenericViewSetHandler):
     @action(methods=["POST"], detail=False, serializer_class=serializers.ExampleCommonUnExceptionRequestSerializer)
     def unexpected_exception(self, request, *args, **kwargs):
         return Response({"name": request.user["no_name"]})
+
+    @swagger_auto_schema(
+        operation_summary=_("序列化器校验异常"),
+        tags=["common"],
+        request_body=serializers.ExampleCommonValidateExceptionRequestSerializer(),
+        responses={status.HTTP_200_OK: serializers.ExampleCommonValidateExceptionResponseSerializer()},
+    )
+    @action(
+        methods=["POST"], detail=False, serializer_class=serializers.ExampleCommonValidateExceptionRequestSerializer
+    )
+    def validate_exception(self, request, *args, **kwargs):
+        return Response({"query_data": self.query_data})
