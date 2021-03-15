@@ -1,0 +1,162 @@
+# -*- coding: utf-8 -*-
+from unittest import mock
+from typing import List, Union, Dict
+
+from django.contrib.auth.models import User
+from django.test import TestCase, RequestFactory, Client
+
+from djangocli.utils.unittest import base
+
+
+class AssertDataMixin:
+    # None表示展示全量断言差异
+    maxDiff = None
+
+    recursion_type = [dict, list]
+    exempted_fields = ["created_at", "updated_at"]
+
+    def remove_keys(self, data: Union[Dict, List], keys: List[str]) -> None:
+        """
+        移除嵌套数据中dict的指定key-value
+        :param data: 目前仅支持List / Dict，后续按需支持
+        :param keys: 需要移除的key列表
+        :return: None
+        """
+        children = []
+        if isinstance(data, dict):
+            for key in keys:
+                data.pop(key, None)
+            children = data.values()
+        elif isinstance(data, list):
+            children = data
+        for child_data in children:
+            if type(child_data) in self.recursion_type:
+                self.remove_keys(child_data, keys)
+        return
+
+    def assertExemptDataStructure(self, actual_data, expected_data, value_eq=True, list_exempt=False):
+        """
+        支持字段豁免的数据断言
+        :param actual_data: 实际的数据
+        :param expected_data: 期望的数据
+        :param value_eq: 子数据是否断言
+        :param list_exempt: 是否豁免列表
+        :return:
+        """
+        self.remove_keys(actual_data, self.exempted_fields)
+        self.remove_keys(expected_data, self.exempted_fields)
+        return self.assertDataStructure(actual_data, expected_data, value_eq, list_exempt, is_sort=False)
+
+    def assertDataStructure(self, actual_data, expected_data, value_eq=True, list_exempt=False, is_sort=True):
+        actual_data_type = type(actual_data)
+
+        self.assertEqual(actual_data_type, type(expected_data))
+
+        if actual_data_type is dict:
+            self.assertListEqual(
+                list(actual_data.keys()),
+                list(expected_data.keys()),
+                msg=f"excepted dict keys -> {expected_data.keys()}, but actual keys -> {actual_data.keys()}",
+            )
+            for expected_key, expected_value in expected_data.items():
+                self.assertDataStructure(
+                    actual_data=actual_data[expected_key],
+                    expected_data=expected_value,
+                    value_eq=value_eq,
+                    list_exempt=list_exempt,
+                    is_sort=is_sort,
+                )
+        elif actual_data_type is list:
+            if list_exempt:
+                return
+            if value_eq:
+                self.assertListEqual(actual_data, expected_data, is_sort=is_sort)
+            else:
+                # 默认列表数据结构一致
+                _expected_data = expected_data[0]
+                for _data in actual_data:
+                    self.assertDataStructure(
+                        _data, _expected_data, value_eq=value_eq, list_exempt=list_exempt, is_sort=is_sort
+                    )
+
+        if value_eq:
+            self.assertEqual(actual_data, expected_data)
+
+    def assertListEqual(self, list1, list2, msg=None, is_sort=False):
+        if is_sort:
+            # TODO 没有考虑Dict类型的排序
+            list1.sort()
+            list2.sort()
+        super().assertListEqual(list1, list2, msg=msg)
+
+
+class MockSuperUserMixin:
+    SUPERUSER_NAME = "admin"
+    SUPERUSER_PASSWORD = "admin"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        # 创建用于测试的超管
+        cls.superuser = User.objects.create_user(
+            username=cls.SUPERUSER_NAME,
+            password=cls.SUPERUSER_PASSWORD,
+            is_superuser=True,
+            is_staff=True,
+            is_active=True,
+        )
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.client.login(username=self.SUPERUSER_NAME, password=self.SUPERUSER_PASSWORD)
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        self.client.logout()
+
+
+class DjangoCliBaseTestCase(AssertDataMixin, MockSuperUserMixin, TestCase):
+    client_class = Client
+
+    @property
+    def request_factory(self):
+        """按需加载request_factory"""
+        if hasattr(self, "_request_factory"):
+            return self._request_factory
+        setattr(self, "_request_factory", RequestFactory())
+        return self._request_factory
+
+    def setUp(self) -> None:
+        """Hook before test function"""
+        super().setUp()
+
+    def tearDown(self) -> None:
+        """Hook after test function"""
+        super().tearDown()
+
+    @classmethod
+    def setUpTestData(cls):
+        """Hook in testcase.__call__ , before setUpClass"""
+        super().setUpTestData()
+
+    @classmethod
+    def setUpClass(cls):
+        """Hook method for setting up class fixture before running tests in the class."""
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Hook method for deconstructing the class fixture after running all tests in the class."""
+        super().tearDownClass()
+        mock.patch.stopall()
+
+
+class DjangoCliAPITestCase(DjangoCliBaseTestCase):
+    client_class = base.DjangoCliAPIClient
+
+
+class DjangoCliSwaggerViewTestCase(DjangoCliAPITestCase):
+    swagger_test_viewset = None
+    url_path_params = {}
+    exempted_actions = []
