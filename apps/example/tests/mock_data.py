@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from rest_framework import status
 
-from apps.example import exceptions as apps_example_exceptions
 from djangocli import exceptions as dc_exceptions
 from djangocli.utils.unittest.base import ApiMockData
+from djangocli.utils.unittest.testcase import MockSuperUserMixin
+from apps.example import exceptions as apps_example_exceptions
 
 API_EXAMPLE_BOOK_SEARCH = ApiMockData(
     request_data={"page": 1, "page_size": 10},
@@ -32,7 +33,9 @@ API_EXAMPLE_COMMON_EXCEPTION = ApiMockData(
         "code": f"{apps_example_exceptions.ExampleAppBaseException.MODULE_CODE}-"
         f"{apps_example_exceptions.ExampleCommonExceptionException.FUNCTION_ERROR_CODE}",
         "data": {},
-        "message": apps_example_exceptions.ExampleCommonExceptionException.MESSAGE_TEMPLATE,
+        "message": apps_example_exceptions.ExampleCommonExceptionException.MESSAGE_TEMPLATE.format(
+            user=MockSuperUserMixin.SUPERUSER_NAME
+        ),
     },
 )
 
