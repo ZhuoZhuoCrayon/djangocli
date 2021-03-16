@@ -96,24 +96,6 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://{host}:{port}/{user}".format(
-            host=os.getenv("DC_REDIS_HOST", "localhost"),
-            port=os.getenv("DC_REDIS_PORT", 6379),
-            user=f"{APP_NAME.lower()}:redis",
-        ),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": os.getenv("DC_REDIS_PASSWORD", ""),
-            # 最大连接数量
-            "CONNECTION_POOL_KWARGS": {"max_connections": 100},
-        },
-        "KEY_FUNCTION": "djangocli.utils.redis.django_cache_key_maker",
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

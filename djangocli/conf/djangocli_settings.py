@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from djangocli.utils import string
 from djangocli.conf.default_settings import *  # noqa
 
 INSTALLED_APPS.extend(
@@ -28,3 +29,39 @@ REST_FRAMEWORK = {
 
 
 ALLOWED_HOSTS = ["*"]
+
+# REDIS
+DEFAULT_REDIS_PORT = 6379
+
+# Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": string.get_redis_url(
+            host=os.getenv("DC_REDIS_HOST", "localhost"), port=os.getenv("DC_REDIS_PORT", 6379), db_index=0
+        ),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": os.getenv("DC_REDIS_PASSWORD", ""),
+            # 最大连接数量
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100},
+        },
+        "KEY_FUNCTION": "djangocli.utils.redis.django_cache_key_maker",
+    }
+}
+
+
+# Celery's config
+
+CELERY_BROKER_URL = string.get_redis_url(
+    password=os.getenv("DC_REDIS_PASSWORD", ""),
+    host=os.getenv("DC_REDIS_HOST", "localhost"),
+    port=os.getenv("DC_REDIS_PORT", 6379),
+    db_index=1,
+)
+
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_TASK_SERIALIZER = "json"
