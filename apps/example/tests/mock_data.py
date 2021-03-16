@@ -4,7 +4,7 @@ from rest_framework import status
 from djangocli import exceptions as dc_exceptions
 from djangocli.utils.unittest.base import ApiMockData
 from djangocli.utils.unittest.testcase import MockSuperUserMixin
-from apps.example import exceptions as apps_example_exceptions
+from apps.example import exceptions as apps_example_exceptions, constants as apps_example_constants
 
 API_EXAMPLE_BOOK_SEARCH = ApiMockData(
     request_data={"page": 1, "page_size": 10},
@@ -59,4 +59,10 @@ API_EXAMPLE_COMMON_VALIDATE_EXCEPTION = ApiMockData(
         "data": {"page": ["该字段是必填项。"], "page_size": ["该字段是必填项。"]},
         "message": "invalid (Details: Invalid input.)",
     },
+)
+
+
+API_COMMON_CELERY_DELAY = ApiMockData(
+    request_data={"left_val": 1, "right_val": 2, "operate": apps_example_constants.MathOp.ADD},
+    response_data={"task_id": "377ef8e1-395b-4a94-9ee5-d084e4b20567"},
 )
