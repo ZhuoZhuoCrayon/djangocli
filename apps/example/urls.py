@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from django.urls import include
 from django.conf.urls import url
+from django.urls import include
 from rest_framework import routers
 
-
 from apps.example import views
-
 
 router = routers.DefaultRouter(trailing_slash=True)
 

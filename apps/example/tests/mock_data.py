@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from rest_framework import status
 
+from apps.example import constants, exceptions
 from djangocli import exceptions as dc_exceptions
 from djangocli.utils.unittest.base import ApiMockData
 from djangocli.utils.unittest.testcase import MockSuperUserMixin
-from apps.example import exceptions as apps_example_exceptions, constants as apps_example_constants
 
-API_EXAMPLE_BOOK_SEARCH = ApiMockData(
+API_BOOK_SEARCH = ApiMockData(
     request_data={"page": 1, "page_size": 10},
     response_data={
         "count": 1,
@@ -26,20 +26,18 @@ API_EXAMPLE_BOOK_SEARCH = ApiMockData(
     },
 )
 
-API_EXAMPLE_COMMON_EXCEPTION = ApiMockData(
+API_COMMON_EXCEPTION = ApiMockData(
     request_data={},
     response_data={
         "result": False,
-        "code": f"{apps_example_exceptions.ExampleAppBaseException.MODULE_CODE}-"
-        f"{apps_example_exceptions.ExampleCommonExceptionException.FUNCTION_ERROR_CODE}",
+        "code": f"{exceptions.ExampleAppBaseException.MODULE_CODE}-"
+        f"{exceptions.CommonExceptionException.FUNCTION_ERROR_CODE}",
         "data": {},
-        "message": apps_example_exceptions.ExampleCommonExceptionException.MESSAGE_TEMPLATE.format(
-            user=MockSuperUserMixin.SUPERUSER_NAME
-        ),
+        "message": exceptions.CommonExceptionException.MESSAGE_TEMPLATE.format(user=MockSuperUserMixin.SUPERUSER_NAME),
     },
 )
 
-API_EXAMPLE_COMMON_UN_EXCEPTION = ApiMockData(
+API_COMMON_UN_EXCEPTION = ApiMockData(
     request_data={},
     response_data={
         "result": False,
@@ -51,7 +49,7 @@ API_EXAMPLE_COMMON_UN_EXCEPTION = ApiMockData(
 )
 
 
-API_EXAMPLE_COMMON_VALIDATE_EXCEPTION = ApiMockData(
+API_COMMON_VALIDATE_EXCEPTION = ApiMockData(
     request_data={},
     response_data={
         "result": False,
@@ -63,6 +61,6 @@ API_EXAMPLE_COMMON_VALIDATE_EXCEPTION = ApiMockData(
 
 
 API_COMMON_CELERY_DELAY = ApiMockData(
-    request_data={"left_val": 1, "right_val": 2, "operate": apps_example_constants.MathOp.ADD},
+    request_data={"left_val": 1, "right_val": 2, "operate": constants.MathOp.ADD},
     response_data={"task_id": "377ef8e1-395b-4a94-9ee5-d084e4b20567"},
 )

@@ -1,6 +1,6 @@
 from django.db import models
-from django_mysql.models import ListCharField
 from django.utils.translation import ugettext_lazy as _
+from django_mysql.models import ListCharField
 
 # Create your models here.
 

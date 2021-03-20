@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from djangocli.utils import string
 from djangocli.conf.default_settings import *  # noqa
+from djangocli.utils import string
 
 INSTALLED_APPS.extend(
     [

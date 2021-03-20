@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from typing import Dict, Any
+from typing import Any, Dict
 
 from django.http import Http404
-from rest_framework import status, exceptions
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import exceptions, status
 
 
 class ModuleErrorCode:

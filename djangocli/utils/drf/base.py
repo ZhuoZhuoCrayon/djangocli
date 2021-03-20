@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Union, Dict, Any, List
+from typing import Any, Dict, List, Union
 
 SUCCESS_CODE = "0"
 

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import json
-from typing import Dict, Any
+from typing import Any, Dict
 
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from djangocli.utils.drf import base
-
 
 # DEFAULT_CONTENT_TYPE & DEFAULT_FORMAT 不能同时设置
 DEFAULT_CONTENT_TYPE = None  # or "application/json"
