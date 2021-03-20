@@ -18,4 +18,8 @@ DATABASES = {
     }
 }
 
-INSTALLED_APPS.extend(["apps.example"])
+INSTALLED_APPS.extend(
+    [
+        # "apps.example",    # 用不到example
+    ]
+)
