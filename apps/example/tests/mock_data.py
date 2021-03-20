@@ -64,3 +64,23 @@ API_COMMON_CELERY_DELAY = ApiMockData(
     request_data={"left_val": 1, "right_val": 2, "operate": constants.MathOp.ADD},
     response_data={"task_id": "377ef8e1-395b-4a94-9ee5-d084e4b20567"},
 )
+
+API_BATCH_CELERY_RESULTS_DELAY = ApiMockData(
+    request_data={"task_ids": ["bafa6f6a-2fba-4fad-9d34-7dc167e8768c", "470a9e20-2abe-413a-89e7-3f18e9351f28"]},
+    response_data=[
+        {
+            "date_done": "2021-03-20T15:51:35.011043",
+            "task_id": "470a9e20-2abe-413a-89e7-3f18e9351f28",
+            "result": 10000000,
+            "status": "SUCCESS",
+            "state": "SUCCESS",
+        },
+        {
+            "date_done": "2021-03-20T15:46:03.580606",
+            "task_id": "bafa6f6a-2fba-4fad-9d34-7dc167e8768c",
+            "result": 3,
+            "status": "SUCCESS",
+            "state": "SUCCESS",
+        },
+    ],
+)
