@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from celery.result import AsyncResult
 

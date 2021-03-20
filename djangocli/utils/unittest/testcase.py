@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+from typing import Dict, List, Union
 from unittest import mock
-from typing import List, Union, Dict
 
 from django.contrib.auth.models import User
-from django.test import TestCase, RequestFactory, Client
+from django.test import Client, RequestFactory, TestCase
 
 from djangocli.utils.unittest import base
 

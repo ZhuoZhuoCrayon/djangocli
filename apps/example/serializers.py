@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
 
-from djangocli.utils.drf import filter
+from apps.example import constants, models
 from apps.example.tests import mock_data
-from apps.example import models, constants
+from djangocli.utils.drf import filter
 
 
 class BookModelSer(serializers.ModelSerializer):

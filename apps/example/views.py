@@ -1,11 +1,11 @@
+from django.utils.translation import ugettext_lazy as _
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
-from django.utils.translation import ugettext_lazy as _
 
+from apps.example import exceptions, handler, models, serializers
 from djangocli.utils.drf import view
-from apps.example import models, serializers, exceptions, handler
 
 # Create your views here.
 

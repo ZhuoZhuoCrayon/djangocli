@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import status
 
-from apps.example import exceptions, constants
+from apps.example import constants, exceptions
 from djangocli import exceptions as dc_exceptions
 from djangocli.utils.unittest.base import ApiMockData
 from djangocli.utils.unittest.testcase import MockSuperUserMixin
