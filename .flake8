@@ -1,4 +1,5 @@
 [flake8]
+python_requires >= 3.7.2
 ignore = F405, W503, E203
 exclude =
     *migrations*,

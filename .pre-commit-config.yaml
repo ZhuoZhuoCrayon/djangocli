@@ -1,15 +1,25 @@
 default_stages: [commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.1.0
+    rev: v3.4.0
     hooks:
     - id: check-merge-conflict
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.9
+    hooks:
+      - id: flake8
+        args: [--min-python-version, "3.7.2"]
+        additional_dependencies: [ flake8-typing-imports==1.9.0 ]
+
   - repo: https://github.com/psf/black
-    rev: stable
+    rev: 20.8b1
     hooks:
     - id: black
       language_version: python3.7
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.1.0
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.5.4
     hooks:
-    - id: flake8
+    - id: isort
+      args: ["--profile", "black"]
