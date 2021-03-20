@@ -7,62 +7,62 @@ from apps.example.tests import mock_data
 from apps.example import models, constants
 
 
-class ExampleBookModelSerializer(serializers.ModelSerializer):
+class BookModelSer(serializers.ModelSerializer):
     class Meta:
         model = models.Book
         fields = "__all__"
 
 
-class ExampleAuthorModelSerializer(serializers.ModelSerializer):
+class AuthorModelSer(serializers.ModelSerializer):
     class Meta:
         model = models.Author
         fields = "__all__"
 
 
-class ExamplePublisherModelSerializer(serializers.ModelSerializer):
+class PublisherModelSer(serializers.ModelSerializer):
     class Meta:
         model = models.Publisher
         fields = "__all__"
 
 
-class ExampleBookSearchRequestSerializer(filter.PageSerializer):
+class BookSearchRequestSer(filter.PageSerializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_BOOK_SEARCH.request_data}
+        swagger_schema_fields = {"example": mock_data.API_BOOK_SEARCH.request_data}
 
 
-class ExampleBookSearchResponseSerializer(serializers.Serializer):
+class BookSearchResponseSer(serializers.Serializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_BOOK_SEARCH.response_data}
+        swagger_schema_fields = {"example": mock_data.API_BOOK_SEARCH.response_data}
 
 
-class ExampleCommonExceptionRequestSerializer(serializers.Serializer):
+class CommonExceptionRequestSer(serializers.Serializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_EXCEPTION.request_data}
+        swagger_schema_fields = {"example": mock_data.API_COMMON_EXCEPTION.request_data}
 
 
-class ExampleCommonExceptionResponseSerializer(serializers.Serializer):
+class CommonExceptionResponseSer(serializers.Serializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_EXCEPTION.response_data}
+        swagger_schema_fields = {"example": mock_data.API_COMMON_EXCEPTION.response_data}
 
 
-class ExampleCommonUnExceptionRequestSerializer(serializers.Serializer):
+class CommonUnExceptionRequestSer(serializers.Serializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_UN_EXCEPTION.request_data}
+        swagger_schema_fields = {"example": mock_data.API_COMMON_UN_EXCEPTION.request_data}
 
 
-class ExampleCommonUnExceptionResponseSerializer(serializers.Serializer):
+class CommonUnExceptionResponseSer(serializers.Serializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_UN_EXCEPTION.response_data}
+        swagger_schema_fields = {"example": mock_data.API_COMMON_UN_EXCEPTION.response_data}
 
 
-class ExampleCommonValidateExceptionRequestSerializer(filter.PageSerializer):
+class CommonValidateExceptionRequestSer(filter.PageSerializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_VALIDATE_EXCEPTION.request_data}
+        swagger_schema_fields = {"example": mock_data.API_COMMON_VALIDATE_EXCEPTION.request_data}
 
 
-class ExampleCommonValidateExceptionResponseSerializer(serializers.Serializer):
+class CommonValidateExceptionResponseSer(serializers.Serializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_EXAMPLE_COMMON_VALIDATE_EXCEPTION.response_data}
+        swagger_schema_fields = {"example": mock_data.API_COMMON_VALIDATE_EXCEPTION.response_data}
 
 
 class CommonCeleryDelayRequestSer(serializers.Serializer):

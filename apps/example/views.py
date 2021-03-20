@@ -4,15 +4,15 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.translation import ugettext_lazy as _
 
-from apps.example import models, serializers, exceptions, handler as apps_example_handler
-from djangocli.utils.drf.view import DjangoCliModelViewSet, DjangoCliGenericViewSetHandler
+from djangocli.utils.drf import view
+from apps.example import models, serializers, exceptions, handler
 
 # Create your views here.
 
 
-class ExampleBookViews(DjangoCliModelViewSet):
+class ExampleBookViews(view.DjangoCliModelViewSet):
     model = models.Book
-    serializer_class = serializers.ExampleBookModelSerializer
+    serializer_class = serializers.BookModelSer
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -20,61 +20,59 @@ class ExampleBookViews(DjangoCliModelViewSet):
     @swagger_auto_schema(
         operation_summary=_("查询书籍"),
         tags=["book"],
-        request_body=serializers.ExampleBookSearchRequestSerializer(),
-        responses={status.HTTP_200_OK: serializers.ExampleBookSearchResponseSerializer()},
+        request_body=serializers.BookSearchRequestSer(),
+        responses={status.HTTP_200_OK: serializers.BookSearchResponseSer()},
     )
-    @action(methods=["POST"], detail=False, serializer_class=serializers.ExampleBookSearchRequestSerializer)
+    @action(methods=["POST"], detail=False, serializer_class=serializers.BookSearchRequestSer)
     def search(self, request, *args, **kwargs):
 
         return Response({"query_data": self.query_data, "list": self.get_queryset().values()})
 
 
-class ExampleAuthorViews(DjangoCliModelViewSet):
+class ExampleAuthorViews(view.DjangoCliModelViewSet):
     model = models.Author
-    serializer_class = serializers.ExampleAuthorModelSerializer
+    serializer_class = serializers.AuthorModelSer
 
     def get_queryset(self):
         return self.model.objects.all()
 
 
-class ExamplePublisherView(DjangoCliModelViewSet):
+class ExamplePublisherView(view.DjangoCliModelViewSet):
     model = models.Publisher
-    serializer_class = serializers.ExamplePublisherModelSerializer
+    serializer_class = serializers.PublisherModelSer
 
     def get_queryset(self):
         return self.model.objects.all()
 
 
-class ExampleCommonViews(DjangoCliGenericViewSetHandler):
+class ExampleCommonViews(view.DjangoCliGenericViewSet):
     @swagger_auto_schema(
         operation_summary=_("主动抛出预期异常"),
         tags=["common"],
-        request_body=serializers.ExampleCommonExceptionRequestSerializer(),
-        responses={status.HTTP_200_OK: serializers.ExampleCommonExceptionResponseSerializer()},
+        request_body=serializers.CommonExceptionRequestSer(),
+        responses={status.HTTP_200_OK: serializers.CommonExceptionResponseSer()},
     )
-    @action(methods=["POST"], detail=False, serializer_class=serializers.ExampleCommonExceptionRequestSerializer)
+    @action(methods=["POST"], detail=False, serializer_class=serializers.CommonExceptionRequestSer)
     def expected_exception(self, request, *args, **kwargs):
-        raise exceptions.ExampleCommonExceptionException(context={"user": request.user})
+        raise exceptions.CommonExceptionException(context={"user": request.user})
 
     @swagger_auto_schema(
         operation_summary=_("系统错误（非预期）异常"),
         tags=["common"],
-        request_body=serializers.ExampleCommonUnExceptionRequestSerializer(),
-        responses={status.HTTP_200_OK: serializers.ExampleCommonUnExceptionResponseSerializer()},
+        request_body=serializers.CommonUnExceptionRequestSer(),
+        responses={status.HTTP_200_OK: serializers.CommonUnExceptionResponseSer()},
     )
-    @action(methods=["POST"], detail=False, serializer_class=serializers.ExampleCommonUnExceptionRequestSerializer)
+    @action(methods=["POST"], detail=False, serializer_class=serializers.CommonUnExceptionRequestSer)
     def unexpected_exception(self, request, *args, **kwargs):
         return Response({"name": request.user["no_name"]})
 
     @swagger_auto_schema(
         operation_summary=_("序列化器校验异常"),
         tags=["common"],
-        request_body=serializers.ExampleCommonValidateExceptionRequestSerializer(),
-        responses={status.HTTP_200_OK: serializers.ExampleCommonValidateExceptionResponseSerializer()},
+        request_body=serializers.CommonValidateExceptionRequestSer(),
+        responses={status.HTTP_200_OK: serializers.CommonValidateExceptionResponseSer()},
     )
-    @action(
-        methods=["POST"], detail=False, serializer_class=serializers.ExampleCommonValidateExceptionRequestSerializer
-    )
+    @action(methods=["POST"], detail=False, serializer_class=serializers.CommonValidateExceptionRequestSer)
     def validate_exception(self, request, *args, **kwargs):
         return Response({"query_data": self.query_data})
 
@@ -88,7 +86,7 @@ class ExampleCommonViews(DjangoCliGenericViewSetHandler):
     def celery_delay(self, request, *args, **kwargs):
         return Response(
             {
-                "task_id": apps_example_handler.CommonHandler.celery_delay(
+                "task_id": handler.CommonHandler.celery_delay(
                     left_val=self.query_data["left_val"],
                     right_val=self.query_data["right_val"],
                     operate=self.query_data["operate"],
@@ -104,4 +102,4 @@ class ExampleCommonViews(DjangoCliGenericViewSetHandler):
     )
     @action(methods=["POST"], detail=False, serializer_class=serializers.CommonBatchCeleryResultsRequestSer)
     def batch_celery_results(self, request, *args, **kwargs):
-        return Response(apps_example_handler.CommonHandler.batch_celery_results(task_ids=self.query_data["task_ids"]))
+        return Response(handler.CommonHandler.batch_celery_results(task_ids=self.query_data["task_ids"]))

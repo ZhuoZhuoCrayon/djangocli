@@ -9,6 +9,6 @@ class ExampleAppBaseException(DjangoCliBaseException):
     MODULE_CODE = AppModuleErrorCode.EXAMPLE
 
 
-class ExampleCommonExceptionException(ExampleAppBaseException):
+class CommonExceptionException(ExampleAppBaseException):
     FUNCTION_ERROR_CODE = "00"
     MESSAGE_TEMPLATE = _("用户[{user}]主动抛出了一个异常")
