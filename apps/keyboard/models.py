@@ -32,3 +32,8 @@ class DataSetMfccFeature(models.Model):
     # 基础字段
     created_at = models.DateTimeField(verbose_name=_("创建时间"), auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name=_("更新时间"), blank=True, null=True, auto_now=True)
+
+    class Meta:
+        verbose_name = _("mfcc特征")
+        verbose_name_plural = _("mfcc特征")
+        ordering = ["id"]
