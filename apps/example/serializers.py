@@ -94,9 +94,9 @@ class CommonBatchCeleryResultsRequestSer(serializers.Serializer):
         return attrs
 
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_COMMON_CELERY_DELAY.request_data}
+        swagger_schema_fields = {"example": mock_data.API_BATCH_CELERY_RESULTS_DELAY.request_data}
 
 
 class CommonBatchCeleryResultsResponseSer(serializers.Serializer):
     class Meta:
-        swagger_schema_fields = {"example": mock_data.API_COMMON_CELERY_DELAY.response_data}
+        swagger_schema_fields = {"example": mock_data.API_BATCH_CELERY_RESULTS_DELAY.response_data}
