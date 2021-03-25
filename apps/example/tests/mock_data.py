@@ -48,6 +48,7 @@ API_COMMON_UN_EXCEPTION = ApiMockData(
     },
 )
 
+
 API_COMMON_VALIDATE_EXCEPTION = ApiMockData(
     request_data={},
     response_data={
