@@ -95,5 +95,5 @@ class ViewSetValidationMixin:
         serializer_inst = serializer_class(data=original_data)
         serializer_inst.is_valid(raise_exception=True)
 
-        self.__query_data = serializer_inst.data
-        return self.__query_data
+        self._query_data = serializer_inst.validated_data
+        return self._query_data
