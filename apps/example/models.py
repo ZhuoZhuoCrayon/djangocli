@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django_mysql.models import ListCharField
 
 # Create your models here.
 
@@ -23,9 +22,7 @@ class Book(models.Model):
 
     # 关联
     publisher_id = models.IntegerField(verbose_name=_("出版社ID"))
-    author_ids = ListCharField(
-        verbose_name=_("作者ID列表"), base_field=models.IntegerField(verbose_name=_("作者ID")), max_length=128
-    )
+    author_ids = models.JSONField(verbose_name=_("作者ID列表"), default=list)
 
     # 基础字段
     created_at = models.DateTimeField(verbose_name=_("创建时间"), auto_now_add=True)
