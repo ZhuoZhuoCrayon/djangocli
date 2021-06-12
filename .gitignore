@@ -13,6 +13,6 @@ __pycache__/
 
 
 ## Settings
-env/dc_*.env
+scripts/deploy/env/local*
 
 logs/
