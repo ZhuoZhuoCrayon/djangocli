@@ -1,17 +1,58 @@
+# https://docs.travis-ci.com/user/job-lifecycle/
 language: python
-python: 3.7
+
+cache:
+  directories:
+  - "$HOME/.cache/pip"
+
+python:
+  - 3.6
+  - 3.7
+  - 3.8
+  - 3.9
 
 services:
   - mysql
+  - redis
+  - rabbitmq
 
-before_script:
+# before the install phase
+before_install:
+  - pip install --upgrade pip
+
+# install any dependencies required
+install:
   - pip install -r requirements.txt
   - pip install flake8
 
-script:
+# before the script phase
+before_script:
   - flake8
   - source scripts/deploy/dev/environ.sh
-  - mysql -uroot -e "CREATE DATABASE IF NOT EXISTS $APP_NAME DEFAULT CHARACTER SET = utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;"
+  - mysql -u$DC_MYSQL_USER -e "CREATE DATABASE IF NOT EXISTS \`$APP_NAME\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+  - python manage.py migrate
 
+
+# run the build script
+# travis-ci 默认script部分的脚本返回非零后继续执行后续语句，以便查看集成结果，如果希望非零时直接暂停，可以通过 && 将脚本集合并成一个语句
+script:
+  - python manage.py test
+
+
+#  when the build succeeds (e.g. building documentation), the result is in TRAVIS_TEST_RESULT environment variable
 # after_success:
 #  - codecov
+
+# when the build fails (e.g. uploading log files), the result is in TRAVIS_TEST_RESULT environment variable
+after_success: skip
+
+# # if and only if deployment is active
+# before_deploy: skip
+#
+#
+# # deploy:
+#
+# # if and only if deployment is active
+# after_deploy: skip
+
+after_script: skip
