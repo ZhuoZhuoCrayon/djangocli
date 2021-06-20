@@ -32,12 +32,10 @@ jobs:
         - DJANGO_VERSION="3.2.0"
         - DJANGO_VERSION="3.2.4"
   exclude:
-    - name: Python<=3.6 无须支持 DJANGO_VERSION=3.2.0
-      python:
-        - 3.6
-      env:
-        - DJANGO_VERSION="3.2.0"
-        - DJANGO_VERSION="3.2.4"
+    - python: 3.6
+      env: DJANGO_VERSION="3.2.0"
+    - python: 3.6
+      env: DJANGO_VERSION="3.2.4"
 
 # before the install phase
 before_install:
