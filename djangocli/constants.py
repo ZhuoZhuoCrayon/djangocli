@@ -15,3 +15,10 @@ class LogModule:
     DJANGO = "django"
     DJANGO_REQUEST = "django.request"
     DJANGO_SERVER = "django.server"
+
+
+class EnvType:
+    DEV = "dev"
+    PROD = "prod"
+    STAG = "stag"
+    LOCAL = "local"
