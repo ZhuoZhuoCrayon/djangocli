@@ -13,6 +13,6 @@ __pycache__/
 
 
 ## Settings
-scripts/deploy/env/local*
+scripts/deploy/local/*
 
 logs/

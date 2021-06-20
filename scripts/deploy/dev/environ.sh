@@ -1,7 +1,7 @@
 export DC_ENV="dev"
 
 
-export DJANGO_SETTINGS_MODULE=settings
+export DJANGO_SETTINGS_MODULE="settings"
 
 export SECRET_KEY="SECRET_KEY"
 export APP_NAME="django-cli"

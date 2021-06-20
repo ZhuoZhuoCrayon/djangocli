@@ -11,7 +11,7 @@ print("Django %s" % django.get_version())
 # 载入项目路径
 sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])
 # 导入环境变量
-dotenv.load_dotenv(dotenv_path=PROJECT_ROOT + "/env/dc_dev.env")
+dotenv.load_dotenv(dotenv_path=PROJECT_ROOT + "/scripts/deploy/local/environ.sh")
 
 # 启动Django
 if "setup" in dir(django):
