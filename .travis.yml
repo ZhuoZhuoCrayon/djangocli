@@ -3,7 +3,7 @@ language: python
 
 cache:
   directories:
-  - "$HOME/.cache/pip"
+   - "$HOME/.cache/pip"
 
 python:
   - 3.6
@@ -16,19 +16,42 @@ services:
   - redis
   - rabbitmq
 
+env:
+  global:
+    - DC_ENV=local
+  jobs:
+    - DJANGO_VERSION="3.1.5"
+    - DJANGO_VERSION="3.2.0"
+    - DJANGO_VERSION="3.2.4"
+
+jobs:
+  allow_failures:
+    # 灰度 Python=3.9 & DJANGO_VERSION>=3.2.0 允许失败
+    - python: 3.9
+      env:
+        - DJANGO_VERSION="3.2.0"
+        - DJANGO_VERSION="3.2.4"
+  exclude:
+    - name: Python<=3.6 无须支持 DJANGO_VERSION=3.2.0
+      python:
+        - 3.6
+      env:
+        - DJANGO_VERSION="3.2.0"
+        - DJANGO_VERSION="3.2.4"
+
 # before the install phase
 before_install:
-  - pip install --upgrade pip
+- pip install --upgrade pip
 
 # install any dependencies required
 install:
-  - pip install -r requirements.txt
-  - pip install flake8
+  - pip install -r scripts/deploy/${DC_ENV}/requirements.txt
+  - pip install django==${DJANGO_VERSION}
 
 # before the script phase
 before_script:
   - flake8
-  - source scripts/deploy/dev/environ.sh
+  - source scripts/deploy/${DC_ENV}/environ.sh
   - mysql -u$DC_MYSQL_USER -e "CREATE DATABASE IF NOT EXISTS \`$APP_NAME\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
   - python manage.py migrate
 
