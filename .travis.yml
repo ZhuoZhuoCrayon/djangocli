@@ -39,7 +39,7 @@ jobs:
 
 # before the install phase
 before_install:
-- pip install --upgrade pip
+  - pip install --upgrade pip
 
 # install any dependencies required
 install:
@@ -57,15 +57,18 @@ before_script:
 # run the build script
 # travis-ci 默认script部分的脚本返回非零后继续执行后续语句，以便查看集成结果，如果希望非零时直接暂停，可以通过 && 将脚本集合并成一个语句
 script:
-  - python manage.py test
+  # 清除历史记录
+  - coverage erase
+  - coverage run ./manage.py test
+  - coverage report
 
 
 #  when the build succeeds (e.g. building documentation), the result is in TRAVIS_TEST_RESULT environment variable
-# after_success:
-#  - codecov
+ after_success:
+  - codecov
 
 # when the build fails (e.g. uploading log files), the result is in TRAVIS_TEST_RESULT environment variable
-after_success: skip
+after_failure: skip
 
 # # if and only if deployment is active
 # before_deploy: skip
