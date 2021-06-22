@@ -2,11 +2,38 @@
 
 import os
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 import dotenv
 
 from djangocli.utils.string import str2bool
+
+
+def get_env(key: str, default: Any = None, _type: type = str, exempt_empty_str: bool = False) -> Any:
+    """
+    获取环境变量，解决os.getenv(key, default)在变量值为空串时导致default值不生效的问题
+    :param key: 变量名
+    :param default: 默认值，若获取不到环境变量会默认使用该值
+    :param _type: 环境变量需要转换的类型，不会转 default
+    :param exempt_empty_str: 是否豁免空串
+    :return:
+    """
+    value = os.getenv(key) or default
+    if value == default:
+        return value
+
+    if isinstance(value, str) and not value and exempt_empty_str:
+        return value
+
+    if _type == bool:
+        return str2bool(value)
+
+    try:
+        value = _type(value)
+    except TypeError:
+        raise TypeError(f"can not convert env value to type -> {_type}")
+
+    return value
 
 
 def get_env_name__value_map(environ_sh_path: str) -> Dict[str, str]:
@@ -68,5 +95,5 @@ def inject_env(environ_sh_path: str) -> None:
     env_file_path = generate_envfile(environ_sh_path=environ_sh_path)
     dotenv.load_dotenv(dotenv_path=env_file_path)
 
-    if not str2bool(os.getenv("DC_KEEP_ENVFILE") or "False"):
+    if not get_env("DC_KEEP_ENVFILE", False, _type=bool):
         os.remove(env_file_path)

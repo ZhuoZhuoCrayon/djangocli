@@ -12,8 +12,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
 from pathlib import Path
+
+from djangocli.core.env import get_env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -23,11 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = get_env("SECRET_KEY")
 
-APP_NAME = os.getenv("APP_NAME")
+APP_NAME = get_env("APP_NAME")
 
-APP_VERSION = os.getenv("APP_VERSION")
+APP_VERSION = get_env("APP_VERSION")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,10 +85,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": APP_NAME,
-        "USER": os.getenv("DC_MYSQL_NAME", "root"),
-        "PASSWORD": os.getenv("DC_MYSQL_PASSWORD", ""),
-        "HOST": os.getenv("DC_MYSQL_HOST", "localhost"),
-        "PORT": os.getenv("DC_MYSQL_PORT", 3306),
+        "USER": get_env("DC_MYSQL_NAME", "root"),
+        "PASSWORD": get_env("DC_MYSQL_PASSWORD", ""),
+        "HOST": get_env("DC_MYSQL_HOST", "localhost"),
+        "PORT": get_env("DC_MYSQL_PORT", 3306, _type=int),
         "TEST": {
             "NAME": f"{APP_NAME}_test",
             "CHARSET": "utf8mb4",

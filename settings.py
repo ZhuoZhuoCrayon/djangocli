@@ -4,11 +4,11 @@ import os
 from pathlib import Path
 
 from djangocli.constants import EnvType
-from djangocli.core.envfile_manage import inject_env
+from djangocli.core.env import get_env, inject_env
 from scripts.check_and_create_log_file import check_and_create_log_file
 
 # 部署环境
-ENV = os.getenv("DC_ENV", EnvType.LOCAL)
+ENV = get_env("DC_ENV", EnvType.LOCAL)
 
 # 项目根目录
 BASE_DIR = Path(__file__).resolve().parent
