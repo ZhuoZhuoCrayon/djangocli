@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from djangocli.conf.default_settings import *  # noqa
 from djangocli.constants import LogModule
 from djangocli.utils import string
@@ -39,11 +41,11 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": string.get_redis_url(
-            host=os.getenv("DC_REDIS_HOST", "localhost"), port=os.getenv("DC_REDIS_PORT", 6379), db_index=0
+            host=get_env("DC_REDIS_HOST", "localhost"), port=get_env("DC_REDIS_PORT", 6379, _type=int), db_index=0
         ),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": os.getenv("DC_REDIS_PASSWORD", ""),
+            "PASSWORD": get_env("DC_REDIS_PASSWORD", ""),
             # 最大连接数量
             "CONNECTION_POOL_KWARGS": {"max_connections": 100},
         },
@@ -55,9 +57,9 @@ CACHES = {
 # Celery's config
 
 CELERY_BROKER_URL = string.get_redis_url(
-    password=os.getenv("DC_REDIS_PASSWORD", ""),
-    host=os.getenv("DC_REDIS_HOST", "localhost"),
-    port=os.getenv("DC_REDIS_PORT", 6379),
+    password=get_env("DC_REDIS_PASSWORD", ""),
+    host=get_env("DC_REDIS_HOST", "localhost"),
+    port=get_env("DC_REDIS_PORT", 6379, _type=int),
     db_index=1,
 )
 
