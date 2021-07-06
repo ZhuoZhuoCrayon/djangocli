@@ -5,7 +5,7 @@ class TimeUnit:
     SECOND = 1
     MINUTE = SECOND * 60
     HOUR = MINUTE * 60
-    DAY = MINUTE * 24
+    DAY = HOUR * 24
 
 
 class LogModule:
