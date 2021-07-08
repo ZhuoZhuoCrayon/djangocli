@@ -14,5 +14,7 @@ __pycache__/
 
 ## Settings
 scripts/deploy/local/*
+scripts/deploy/prod/*
+scripts/deploy/stag/*
 
 logs/
