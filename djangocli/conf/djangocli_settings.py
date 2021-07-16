@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from multiprocessing import cpu_count
 
 from djangocli.conf.default_settings import *  # noqa
 from djangocli.constants import LogModule
@@ -30,10 +31,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "djangocli.utils.drf.filter.DjangoCliPageNumberPagination",
 }
 
+# 可控性能
+MAXIMUM_CONCURRENT_NUMBER = get_env("MAXIMUM_CONCURRENT_NUMBER", cpu_count(), _type=int)
 
+# cross
 ALLOWED_HOSTS = ["*"]
 
-# REDIS
+# Redis
 DEFAULT_REDIS_PORT = 6379
 
 # Cache
@@ -41,7 +45,9 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": string.get_redis_url(
-            host=get_env("DC_REDIS_HOST", "localhost"), port=get_env("DC_REDIS_PORT", 6379, _type=int), db_index=0
+            host=get_env("DC_REDIS_HOST", "localhost"),
+            port=get_env("DC_REDIS_PORT", DEFAULT_REDIS_PORT, _type=int),
+            db_index=0,
         ),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -54,12 +60,12 @@ CACHES = {
 }
 
 
-# Celery's config
+# Celery
 
 CELERY_BROKER_URL = string.get_redis_url(
     password=get_env("DC_REDIS_PASSWORD", ""),
     host=get_env("DC_REDIS_HOST", "localhost"),
-    port=get_env("DC_REDIS_PORT", 6379, _type=int),
+    port=get_env("DC_REDIS_PORT", DEFAULT_REDIS_PORT, _type=int),
     db_index=1,
 )
 
@@ -70,7 +76,7 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_TASK_SERIALIZER = "json"
 
 
-# LOG
+# Log
 
 LOGGING_FILE_ROOT = os.path.join(BASE_DIR, "logs")
 
