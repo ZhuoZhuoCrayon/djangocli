@@ -1,0 +1,237 @@
+# Default values for djangocli.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+# 水平自动扩容
+autoscaling:
+  enabled: false
+
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+imagePullSecrets: []
+
+
+# 私有仓库需要填写镜像仓库账户信息
+#imageCredentials:
+#  registry:
+#  username:
+#  password:
+#  email:
+
+appCredentials:
+  secretKey:
+  appName: "django-cli"
+  appVersion: "latest"
+  superuser:
+     username:
+     password:
+     email:
+
+
+backend:
+  image:
+    repository: caicrayon/djangocli
+    #  在镜像已经存在的情况下直接略过拉取镜像的操作，参考：https://kubernetes.io/zh/docs/concepts/containers/images/
+    imagePullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.5.1"
+
+
+  service:
+    type: "NodePort"
+    # 用于集群内其他 pod 访问，Service Port
+    port: 2170
+    # Pod Port，服务转发的目标端口
+    targetPort: 2170
+    # nodePort 外部流量访问 service
+    nodePort: 32170
+
+
+nginx:
+  image:
+    repository: nginx
+    imagePullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: stable
+
+  service:
+    type: "NodePort"
+    # 用于集群内其他 pod 访问，Service Port
+    port: 80
+    # Pod Port，服务转发的目标端口
+    targetPort: 80
+    # nodePort 外部流量访问 service
+    nodePort: 30080
+
+
+celeryworker:
+  image:
+    repository: caicrayon/djangocli
+    imagePullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "0.5.1"
+
+
+## MariaDB chart configuration
+## https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
+##
+mariadb:
+  ## @param mariadb.enabled Whether to deploy a mariadb server to satisfy the applications database requirements
+  ## To use an external database set this to false and configure the externalDatabase parameters
+  ##
+  enabled: true
+  ## @param mariadb.architecture MariaDB architecture. Allowed values: `standalone` or `replication`
+  ##
+  architecture: standalone
+  ## MariaDB Authentication parameters
+  ##
+  auth:
+    ## @param mariadb.auth.rootPassword Password for the MariaDB `root` user
+    ## ref: https://github.com/bitnami/bitnami-docker-mariadb#setting-the-root-password-on-first-run
+    ##
+    # 需要初始化root密码，才能使用root权限
+    rootPassword: "123"
+    ## @param mariadb.auth.database Database name to create
+    ## ref: https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-on-first-run
+    ##
+    database: "django-cli"
+    ## @param mariadb.auth.username Database user to create
+    ## ref: https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-user-on-first-run
+    ##
+    username: "djangocli"
+    ## @param mariadb.auth.password Password for the database
+    ##
+    password: "djangocli"
+
+  # 参考 https://github.com/bitnami/charts/blob/master/bitnami/mariadb/templates/primary/statefulset.yaml
+  # 将初始化脚本挂载到 /docker-entrypoint-initdb.d
+  # 翻阅 docker 镜像查看该目录工作原理，可以通过root执行sql
+  # https://github.com/bitnami/bitnami-docker-mariadb/blob/master/10.5/debian-10/rootfs/opt/bitnami/scripts/libmariadb.sh
+  initdbScripts:
+    grant_user_pms.sql: |
+      grant all privileges on *.* to 'djangocli'@'%';
+      flush privileges;
+
+  primary:
+    ## Enable persistence using Persistent Volume Claims
+    ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+    ##
+    service:
+      type: "NodePort"
+      # 用于集群内其他 pod 访问
+      port: 3306
+      # nodePort 外部流量访问 service
+      nodePort: 30036
+
+    configuration: |-
+      [mysqld]
+      skip-name-resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mariadb
+      plugin_dir=/opt/bitnami/mariadb/plugin
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      tmpdir=/opt/bitnami/mariadb/tmp
+      max_allowed_packet=16M
+      bind-address=0.0.0.0
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+      log-error=/opt/bitnami/mariadb/logs/mysqld.log
+      # change charset
+      collation-server = utf8mb4_unicode_ci
+      init-connect='SET NAMES utf8mb4'
+      character-set-server = utf8mb4
+      [client]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      # change charset
+      default-character-set=utf8mb4
+      plugin_dir=/opt/bitnami/mariadb/plugin
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+
+    persistence:
+      ## @param mariadb.primary.persistence.enabled Enable database persistence using PVC
+      ##
+      enabled: true
+      ## @param mariadb.primary.persistence.storageClass MariaDB primary persistent volume storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      storageClass: ""
+      ## @param mariadb.primary.persistence.accessModes Database Persistent Volume Access Modes
+      ##
+      accessModes:
+        - ReadWriteOnce
+      ## @param mariadb.primary.persistence.size Database Persistent Volume Size
+      ##
+      # 需满足正则 ^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
+      # 空间不要设太小，可能会出现Pod拉不起来的现象
+      size: 1Gi
+      ## @param mariadb.primary.persistence.hostPath Set path in case you want to use local host path volumes (not recommended in production)
+      ##
+      hostPath: ""
+      ## @param mariadb.primary.persistence.existingClaim Name of an existing `PersistentVolumeClaim` for MariaDB primary replicas
+      ##
+      existingClaim: ""
+## External MariaDB configuration
+##
+externalMariaDB:
+  host: "host.docker.internal"
+  port: 3306
+  username:
+  password:
+
+
+## Redis chart configuration
+## https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+##
+redis:
+  ## @param redis.enabled Whether to deploy a redis
+  ## To use an external redis set this to false and configure the externalRedis parameters
+  ##
+  enabled: true
+  ## @param redis.architecture Redis architecture. Allowed values: standalone or replication
+  ##
+  architecture: standalone
+  ## Redis Authentication parameters
+  ##
+  auth:
+    ## @param redis.auth.enabled Enable password authentication
+    ##
+    enabled: true
+    ## @param redis.auth.password Password for the database
+    ##
+    password: "djangocli"
+
+  master:
+    service:
+      type: "NodePort"
+      # 用于集群内其他 pod 访问
+      port: 6379
+      # nodePort 外部流量访问 service
+      nodePort: 30079
+
+    persistence:
+      size: 1Gi
+
+## External Redis configuration
+##
+externalRedis:
+  # 简化判定，使用额外数据库需要给定完整的验证信息
+  host: "host.docker.internal"
+  port: 6739
+  password:
