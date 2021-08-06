@@ -1,0 +1,6 @@
+Chart.lock
+charts/*.tgz
+tests/
+*.log
+values-private.yaml
+static-pvc.yaml

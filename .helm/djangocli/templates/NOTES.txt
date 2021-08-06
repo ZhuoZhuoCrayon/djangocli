@@ -1,0 +1,11 @@
+1. Please check all pods is running: kubectl get pod -A
+
+2. Get the application URL by running these commands:
+- minikube: minikube service {{ include "djangocli.nginx.fullname" .}} --url
+- k8s: http://127.0.0.1:{{ .Values.nginx.service.nodePort }}
+
+3. List services and access from outer: minikube get svc -A
+
+4. Enter container to debug: kubectl exec -it <POD> -c <CONTAINER> -- sh
+
+5. Get container's log: kubectl logs <POD> -c <CONTAINER>

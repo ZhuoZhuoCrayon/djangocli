@@ -13,7 +13,6 @@ exclude = '''
   | build
   | dist
   | migrations
-  | iam
 
   # 以下为项目需要忽略的其他目录
 )/
