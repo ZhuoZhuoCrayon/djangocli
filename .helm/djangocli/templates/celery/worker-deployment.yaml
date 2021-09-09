@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "djangocli.celeryworker.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "djangocli.celeryworker.fullname" . }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels: {{ include "common.labels.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels: {{ include "common.labels.matchLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "djangocli.celeryworker.fullname" . }}
+    spec:
+      imagePullSecrets:
+      - name: {{ include "djangocli.secret.image.name" . }}
+      serviceAccountName: {{ include "djangocli.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      containers:
+        - name: {{ include "djangocli.celeryworker.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.celeryworker.image.repository }}:{{ .Values.celeryworker.image.tag }}"
+          imagePullPolicy: {{ .Values.celeryworker.image.imagePullPolicy | default "IfNotPresent" | quote }}
+          command:
+            - "celery"
+            - "-A"
+            - "djangocli"
+            - "worker"
+            - "-l"
+            - "info"
+          env:
+            {{- include "djangocli.commonEnv" .  | nindent 12 }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

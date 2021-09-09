@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "djangocli.nginx.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "djangocli.nginx.fullname" . }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels: {{ include "common.labels.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels: {{ include "common.labels.matchLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "djangocli.nginx.fullname" . }}
+    spec:
+      imagePullSecrets:
+      - name: {{ include "djangocli.secret.image.name" . }}
+      serviceAccountName: {{ include "djangocli.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      initContainers:
+        - name: {{ include "djangocli.nginx.fullname" . }}-collect
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.imagePullPolicy | default "IfNotPresent" | quote }}
+          command: ["cp", "-r", "/code/static/", "/code/staticfiles/"]
+          volumeMounts:
+            - mountPath: "/code/staticfiles/"
+              name: static
+      volumes:
+        - name: static
+          emptyDir: {}
+        - name: nginx-conf
+          configMap:
+            name: {{ include "djangocli.nginx.fullname" . }}-nginx-conf
+
+      containers:
+        - name: {{ include "djangocli.nginx.fullname" . }}
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/
+            - name: static
+              mountPath: /code/static/
+          ports:
+            - containerPort: {{ .Values.nginx.service.targetPort }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
