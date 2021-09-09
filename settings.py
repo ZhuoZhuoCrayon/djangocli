@@ -13,11 +13,11 @@ ENV = get_env("DC_ENV", EnvType.LOCAL)
 # 项目根目录
 BASE_DIR = Path(__file__).resolve().parent
 
-# 对于本地开发环境，通过建立.env文件，可以在启动时便导入环境变量，解决envfile不支持在Pycharm Terminal / Python Console
-# 中导入环境变量的问题，当然也可以将env/script的脚本分别加入到PyCharm的启用脚本（Terminal仍不支持前置命令；）
+# 对于本地开发环境，通过建立.env文件，可以在启动时便导入环境变量，解决 envfile 不支持在Pycharm Terminal / Python Console
+# 中导入环境变量的问题，当然也可以将 env/script 的脚本分别加入到PyCharm的启用脚本（Terminal仍不支持前置命令；）
 # -- 脚手架仅维护 environ.sh 👇👇👇
 # .sh在生产环境仍为主流，为了避免一套环境维护两种类型的文件，在该脚手架中仅维护environ.sh文件，通过动态生成.env文件注入Django运行环境
-inject_env(environ_sh_path=f"{BASE_DIR}/scripts/deploy/{ENV}/environ.sh")
+inject_env(environ_sh_path=f"{BASE_DIR}/support-files/deploy/{ENV}/environ.sh")
 
 # 默认配置文件模块，当相应环境的配置文件模块不存在时需要导入该默认配置
 DEFAULT_CONF_MODULE = os.getenv("DC_DEFAULT_CONF_MODULE") or "conf.default_settings"

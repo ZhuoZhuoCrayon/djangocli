@@ -13,8 +13,8 @@ __pycache__/
 
 
 ## Settings
-scripts/deploy/local/*
-scripts/deploy/prod/*
-scripts/deploy/stag/*
+support-files/deploy/local/*
+support-files/deploy/prod/*
+support-files/deploy/stag/*
 
 logs/

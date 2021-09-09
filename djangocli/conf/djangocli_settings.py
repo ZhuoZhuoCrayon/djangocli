@@ -31,6 +31,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "djangocli.utils.drf.filter.DjangoCliPageNumberPagination",
 }
 
+
+# 静态资源
+# 引用位于 STATIC_ROOT 中的静态文件时要使用的 URL
+STATIC_URL = "/static/"
+# collectstatic 将收集静态文件进行部署的目录的绝对路径
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 # 可控性能
 MAXIMUM_CONCURRENT_NUMBER = get_env("MAXIMUM_CONCURRENT_NUMBER", cpu_count(), _type=int)
 

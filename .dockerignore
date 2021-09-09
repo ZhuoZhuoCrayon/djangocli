@@ -1,0 +1,18 @@
+## Project Part
+.git/
+.idea/
+.DS_Store
+.tmp/
+.vscode/
+db.sqlite3
+
+## Python Part
+
+__pycache__/
+
+## Extra Part
+.helm/
+docs/
+logs/
+support-files/deploy/*
+!support-files/deploy/prod/
