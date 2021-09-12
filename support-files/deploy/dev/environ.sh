@@ -8,6 +8,7 @@ export APP_NAME="django-cli"
 export APP_VERSION="v1"
 
 # DB
+export DC_MYSQL_NAME="django-cli"
 export DC_MYSQL_USER="root"
 export DC_MYSQL_PASSWORD=""
 export DC_MYSQL_HOST="localhost"
