@@ -1,3 +1,7 @@
 2021-09-12 10:21:
   feature:
     - "支持非强制的环境变量注入 (close #95)"
+
+2021-09-12 12:13:
+  feature:
+    - "Travis 自动化测试迁移至 GitHub Actions (close #93)"
