@@ -17,7 +17,10 @@ BASE_DIR = Path(__file__).resolve().parent
 # 中导入环境变量的问题，当然也可以将 env/script 的脚本分别加入到PyCharm的启用脚本（Terminal仍不支持前置命令；）
 # -- 脚手架仅维护 environ.sh 👇👇👇
 # .sh在生产环境仍为主流，为了避免一套环境维护两种类型的文件，在该脚手架中仅维护environ.sh文件，通过动态生成.env文件注入Django运行环境
-inject_env(environ_sh_path=f"{BASE_DIR}/support-files/deploy/{ENV}/environ.sh")
+# 在0.5.3 通过开放配置的形式，决定是否注入 env -> https://github.com/ZhuoZhuoCrayon/djangocli/issues/95
+IS_INJECT_ENV = get_env(key="IS_INJECT_ENV", default=True, _type=bool)
+if IS_INJECT_ENV:
+    inject_env(environ_sh_path=f"{BASE_DIR}/support-files/deploy/{ENV}/environ.sh")
 
 # 默认配置文件模块，当相应环境的配置文件模块不存在时需要导入该默认配置
 DEFAULT_CONF_MODULE = os.getenv("DC_DEFAULT_CONF_MODULE") or "conf.default_settings"
