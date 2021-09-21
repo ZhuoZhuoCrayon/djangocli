@@ -66,10 +66,10 @@ jobs:
         echo "current version -> $current_version"
 
         next_version=$( python scripts/workflows/release/version_increment.py --version "$current_version" )
-        echo "next version -> next_version"
+        echo "next version -> $next_version"
 
         # 检出新开发分支
-        git checkout -b "${yml_next_version}-rc"
+        git checkout -b "${next_version}-rc"
 
         # 创建新开发版本的开发日志目录
         next_version_dev_log_dir_path="${{ env.DEV_LOG_ROOT }}/$next_version"
