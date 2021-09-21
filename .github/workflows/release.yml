@@ -26,6 +26,12 @@ jobs:
       with:
         python-version: 3.7
 
+    - name: Install requirements
+      run: |
+        pip install PyYAML
+        pip install packaging
+        pip install ruamel.yaml
+
     - name: Generate Dev log & Create Tag
       run: |
         # 获取最新的已发布版本
