@@ -1,0 +1,77 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Release Version
+
+on:
+  push:
+    branches:
+      - 0.5.x-rc
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MAIN_BRANCH: "0.5.x-rc"
+      VERSION_KW_P: "appVersion"
+      GITHUB_USERNAME: "github-actions"
+      APP_DESC_YAML: ".helm/Chart.yaml"
+      DEV_LOG_ROOT: "djangocli/docs/dev_log"
+      RELEASE_LOG_ROOT: "djangocli/docs/release"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Generate Dev log & Create Tag
+      run: |
+        # 获取最新的已发布版本
+        current_version=$( python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op get )
+        echo "current version -> $current_version"
+
+        # 获取并更新发布日志
+        release_log=$( python scripts/workflows/release/upgrade_release_log.py -v "$current_version" -d ${{ env.DEV_LOG_ROOT }} -r ${{ env.RELEASE_LOG_ROOT }} )
+        echo "release_log -> $release_log"
+
+        # 设置最新的版本号
+        pending_release_version=$( python scripts/workflows/release/get_pending_release_version.py -d -d ${{ env.DEV_LOG_ROOT }} )
+        echo "pending_release_version -> $pending_release_version"
+        python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op set --value "$pending_release_version"
+
+        # 推送发布日志
+        git config --global user.email "${{ env.GITHUB_USERNAME }}@users.noreply.github.com"
+        git config --global user.name "${{ env.GITHUB_USERNAME }}"
+        git add .
+        git commit -m "docs: auto generate $pending_release_version release log"
+        git push origin ${{ env.MAIN_BRANCH }}
+
+        # 创建并推送标签
+        git tag -a "$pending_release_version" -m "$release_log"
+        git push origin "$pending_release_version"
+
+    - name: Start New Version
+      run: |
+
+        # Generate Dev log & Create Tag 已将版本发布，此时yaml获取的是最新版本号
+        current_version=$( python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op get )
+        echo "current version -> $current_version"
+
+        next_version=$( python scripts/workflows/release/version_increment.py --version "$current_version" )
+        echo "next version -> next_version"
+
+        # 检出新开发分支
+        git checkout -b "${yml_next_version}-rc"
+
+        # 创建新开发版本的开发日志目录
+        next_version_dev_log_dir_path="${{ env.DEV_LOG_ROOT }}/$next_version"
+        echo "next_version_dev_log_dir_path -> $next_version_dev_log_dir_path"
+        mkdir -p "$next_version_dev_log_dir_path"
+        touch "$next_version_dev_log_dir_path/.gitkeep"
+
+        # 推送到仓库
+        git add .
+        git commit -m "minor: start new version ${yml_next_version}"
+        git push origin "${yml_next_version}-rc"

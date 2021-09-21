@@ -5,3 +5,7 @@
 2021-09-12 12:13:
   feature:
     - "Travis 自动化测试迁移至 GitHub Actions (close #93)"
+
+2021-09-21 17:25:
+  feature:
+    - "版本自动发布 (#97)"
