@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAIN_BRANCH: "0.5.x-rc"
+      STEP_LOG_TMP_BRANCH: "tmp_main"
+      STEP_NEW_VERSION_TMP_BRANCH: "tmp_rc"
       VERSION_KW_P: "appVersion"
       GITHUB_USERNAME: "github-actions"
       APP_DESC_YAML: ".helm/Chart.yaml"
@@ -34,6 +36,11 @@ jobs:
 
     - name: Generate Dev log & Create Tag
       run: |
+
+        git config --global user.email "${{ env.GITHUB_USERNAME }}@users.noreply.github.com"
+        git config --global user.name "${{ env.GITHUB_USERNAME }}"
+        git checkout -b ${{ env.STEP_LOG_TMP_BRANCH }} origin/${{ env.MAIN_BRANCH }}
+
         # 获取最新的已发布版本
         current_version=$( python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op get )
         echo "current version -> $current_version"
@@ -48,8 +55,6 @@ jobs:
         python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op set --value "$pending_release_version"
 
         # 推送发布日志
-        git config --global user.email "${{ env.GITHUB_USERNAME }}@users.noreply.github.com"
-        git config --global user.name "${{ env.GITHUB_USERNAME }}"
         git add .
         git commit -m "docs: auto generate $pending_release_version release log"
         git push origin ${{ env.MAIN_BRANCH }}
@@ -61,6 +66,10 @@ jobs:
     - name: Start New Version
       run: |
 
+        git config --global user.email "${{ env.GITHUB_USERNAME }}@users.noreply.github.com"
+        git config --global user.name "${{ env.GITHUB_USERNAME }}"
+        git checkout -b ${{ env.STEP_NEW_VERSION_TMP_BRANCH }} origin/${{ env.MAIN_BRANCH }}
+
         # Generate Dev log & Create Tag 已将版本发布，此时yaml获取的是最新版本号
         current_version=$( python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op get )
         echo "current version -> $current_version"
@@ -68,8 +77,13 @@ jobs:
         next_version=$( python scripts/workflows/release/version_increment.py --version "$current_version" )
         echo "next version -> $next_version"
 
+        # 删除并新建rc分支，防止重试场景下本地分支污染
+        rc_branch="${next_version}-rc"
+        git branch -D rc_branch &>/dev/null || true
+        git push origin --delete $rc_branch &>/dev/null || true
+
         # 检出新开发分支
-        git checkout -b "${next_version}-rc"
+        git checkout -b $rc_branch origin/${{ env.MAIN_BRANCH }}
 
         # 创建新开发版本的开发日志目录
         next_version_dev_log_dir_path="${{ env.DEV_LOG_ROOT }}/$next_version"
@@ -80,4 +94,13 @@ jobs:
         # 推送到仓库
         git add .
         git commit -m "minor: start new version $next_version"
-        git push origin "${next_version}-rc"
+        git push origin $rc_branch
+
+    - name: Delete tmp branches
+      run: |
+        # 删除可能存在的临时分支
+        # 参考：https://stackoverflow.com/questions/22375434/how-do-i-delete-a-branch-without-an-error-message-if-the-branch-does-not-exist
+        git branch -D ${{ env.STEP_LOG_TMP_BRANCH }} &>/dev/null || true
+        git push origin --delete ${{ env.STEP_LOG_TMP_BRANCH }} &>/dev/null || true
+
+        git branch -D ${{ env.STEP_NEW_VERSION_TMP_BRANCH }} &>/dev/null || true
