@@ -43,7 +43,7 @@ jobs:
         echo "release_log -> $release_log"
 
         # 设置最新的版本号
-        pending_release_version=$( python scripts/workflows/release/get_pending_release_version.py -d -d ${{ env.DEV_LOG_ROOT }} )
+        pending_release_version=$( python scripts/workflows/release/get_pending_release_version.py -d ${{ env.DEV_LOG_ROOT }} )
         echo "pending_release_version -> $pending_release_version"
         python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op set --value "$pending_release_version"
 
