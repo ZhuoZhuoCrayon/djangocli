@@ -76,9 +76,12 @@ jobs:
         git push origin ${{ env.MAIN_BRANCH }}
         echo "✨️ main branch -> ${{ env.MAIN_BRANCH }} has been updated"
 
+        # 获取发布日志路径
+        release_log_path=$( echo ${{ env.RELEASE_LOG_ROOT }}/$(ls -a ${{ env.RELEASE_LOG_ROOT }} | grep "$prerelease_version"-) )
+
         # 设置输出
-        echo "::set-output name=release_log::$(echo $release_log)"
         echo "::set-output name=latest_version::$(echo $latest_version)"
+        echo "::set-output name=release_log_path::$(echo $release_log_path)"
         echo "::set-output name=prerelease_version::$(echo $prerelease_version)"
 
     - id: create-tag
@@ -86,7 +89,7 @@ jobs:
       run: |
         # 从上个步骤获取预发布版本号，拼接为标签名称
         tag_name=$( echo "${{ env.TAG_NAME_PREFIX }}${{ steps.generate-dev-log.outputs.prerelease_version }}" )
-        release_log=$( echo "${{ steps.generate-dev-log.outputs.release_log }}" )
+        release_log=$( cat ${{ steps.generate-dev-log.outputs.release_log_path }} )
         echo "🏷️ tag -> $tag_name will be created"
 
         # 创建并推送标签
@@ -108,8 +111,7 @@ jobs:
       with:
         tag_name: ${{ steps.create-tag.outputs.tag_name }}
         release_name: ${{ env.RELEASE_NAME_PREFIX }}${{ steps.generate-dev-log.outputs.prerelease_version }}
-        body: |
-          ${{ steps.generate-dev-log.outputs.release_log }}
+        body_path: ${{ steps.generate-dev-log.outputs.release_log_path }}
         draft: false
         prerelease: false
 
