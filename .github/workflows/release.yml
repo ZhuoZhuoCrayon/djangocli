@@ -56,11 +56,11 @@ jobs:
       run: |
         # 获取当前版本
         latest_version=$( python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op get )
-        echo "☁️ latest_version -> $latest_version"
+        echo "🔥 latest_version -> $latest_version"
 
         # 获取并更新发布日志
         release_log=$( python scripts/workflows/release/upgrade_release_log.py -d ${{ env.DEV_LOG_ROOT }} -r ${{ env.RELEASE_LOG_ROOT }} )
-        echo "📒 release_log -> 👇👇👇 \n$release_log"
+        echo "📒 release_log -> 👇👇👇 $release_log"
 
         # 找出 dev_log 最后活跃的版本号，该版本号为预发布版本
         prerelease_version=$( python scripts/workflows/release/get_prerelease_version.py -d ${{ env.DEV_LOG_ROOT }} )
@@ -74,18 +74,19 @@ jobs:
         git add .
         git commit -m "docs: auto generate $prerelease_version release log"
         git push origin ${{ env.MAIN_BRANCH }}
-        echo "☕️ main branch -> ${{ env.MAIN_BRANCH }} has been updated"
+        echo "✨️ main branch -> ${{ env.MAIN_BRANCH }} has been updated"
 
         # 设置输出
         echo "::set-output name=release_log::$(echo $release_log)"
         echo "::set-output name=latest_version::$(echo $latest_version)"
-        echo "::set-output name=prerelease_version::$(echo prerelease_version)"
+        echo "::set-output name=prerelease_version::$(echo $prerelease_version)"
 
     - id: create-tag
       name: Create Tag
       run: |
         # 从上个步骤获取预发布版本号，拼接为标签名称
         tag_name="${{ env.TAG_NAME_PREFIX }}${{ steps.generate-dev-log.outputs.prerelease_version }}"
+        release_log=${{ steps.generate-dev-log.outputs.release_log }}
         echo "🏷️ tag -> $tag_name will be created"
 
         # 创建并推送标签
@@ -93,8 +94,8 @@ jobs:
         # 参考：https://stackoverflow.com/questions/2788092/start-a-git-commit-message-with-a-hashmark
         # 参考：https://git.kernel.org/pub/scm/git/git.git/plain/Documentation/git-commit.txt
         git tag -a "$tag_name" -m "$release_log" --cleanup=verbatim
-        git push origin "$prerelease_version"
-        echo "☕️ tag -> $tag_name has been created"
+        git push origin "$tag_name"
+        echo "✨️ tag -> $tag_name has been created"
 
         # 输出 tag_name
         echo "::set-output name=tag_name::$(echo $tag_name)"
@@ -118,7 +119,7 @@ jobs:
 
         # 版本已发布，此时取出的预发布版本是最新版本
         latest_version="${{ steps.generate-dev-log.outputs.prerelease_version }}"
-        echo "☁️ latest_version -> $latest_version"
+        echo "🔥️ latest_version -> $latest_version"
 
         next_version=$( python scripts/workflows/release/version_increment.py --version "$latest_version" )
         echo "⬇️ next_version -> $next_version"
@@ -130,7 +131,7 @@ jobs:
 
         # 创建新开发版本的开发日志目录
         next_version_dev_log_dir_path="${{ env.DEV_LOG_ROOT }}/$next_version"
-        echo "📃 next_version_dev_log_dir_path -> $next_version_dev_log_dir_path"
+        echo "📖 next_version_dev_log_dir_path -> $next_version_dev_log_dir_path"
         mkdir -p "$next_version_dev_log_dir_path"
         touch "$next_version_dev_log_dir_path/.gitkeep"
 
@@ -138,7 +139,7 @@ jobs:
         git add .
         git commit -m "minor: start new version $next_version"
         git push origin "$dev_branch_name"
-        echo "☕️ dev_branch -> $dev_branch_name has been created"
+        echo "✨️ dev_branch -> $dev_branch_name has been created"
 
     - id: celebrate
       name: Celebrate
