@@ -8,13 +8,12 @@ from pathlib import Path
 from typing import Dict, List, Union
 
 import yaml
-from get_pending_release_version import get_pending_release_version
+from get_prerelease_version import get_prerelease_version
 
 HELP_TEXT = f"""
 生成发布日志
 通用参数：
         [ -h, --help               [可选] "说明文档" ]
-        [ -v, --current-version    [必选] "当前版本" ]
         [ -d, --dev-log-root       [必选] "开发日志目录路径" ]
         [ -r, --release-log-root   [必选] "发布日志路径" ]
 """
@@ -22,18 +21,16 @@ HELP_TEXT = f"""
 
 def extract_params(argv) -> Dict[str, Union[str, bool, int, float]]:
     try:
-        opts, args = getopt.getopt(argv, "hv:d:r:", ["current-version=", "dev-log-root=", "release-log-root=" "help"])
+        opts, args = getopt.getopt(argv, "hd:r:", ["dev-log-root=", "release-log-root=" "help"])
     except getopt.GetoptError:
         print(HELP_TEXT)
         sys.exit(2)
 
-    sh_params = {"current-version": None, "dev-log-root": None, "release-log-root": None}
+    sh_params = {"dev-log-root": None, "release-log-root": None}
     for opt, arg in opts:
         if opt in ("h", "--help"):
             print(HELP_TEXT)
             sys.exit(2)
-        elif opt in ("-v", "--current-version"):
-            sh_params["current-version"] = arg
 
         elif opt in ("-d", "--dev-log-root"):
             sh_params["dev-log-root"] = arg
@@ -47,13 +44,12 @@ def extract_params(argv) -> Dict[str, Union[str, bool, int, float]]:
 if __name__ == "__main__":
     params = extract_params(sys.argv[1:])
     dev_log_root = params["dev-log-root"]
-    current_version = params["current-version"]
     release_log_root = params["release-log-root"]
 
     # 获取等待发布的版本号
-    pending_release_version = get_pending_release_version(dev_log_root=dev_log_root)
+    prerelease_version = get_prerelease_version(dev_log_root=dev_log_root)
     # 具体到某个版本的开发日志
-    dev_yaml_dir_path = os.path.join(dev_log_root, pending_release_version)
+    dev_yaml_dir_path = os.path.join(dev_log_root, prerelease_version)
     # 列举归档的yaml文件
     dev_yaml_file_name_list = os.listdir(dev_yaml_dir_path)
     # 根据pr类型对开发日志文本进行聚合
@@ -75,7 +71,7 @@ if __name__ == "__main__":
             continue
 
     # 拼接日志
-    release_text = f"\n## {pending_release_version} - {datetime.date.today()} \n"
+    release_text = f"\n## {prerelease_version} - {datetime.date.today()} \n"
     for pr_type, msgs in msgs_group_by_pr_type.items():
         release_text += f"\n### {pr_type}: \n* " + "\n* ".join(msgs)
 
@@ -100,11 +96,11 @@ if __name__ == "__main__":
             release_md_fs.write(release_text + "\n")
 
     # 删除该版本的多余发布日志
-    for release_md_path_to_be_deleted in Path(release_log_root).glob(f"{pending_release_version}*.md"):
+    for release_md_path_to_be_deleted in Path(release_log_root).glob(f"{prerelease_version}*.md"):
         os.remove(release_md_path_to_be_deleted)
 
     # 另写一份发布日志到 version-date.md
-    version_release_md_path = os.path.join(release_log_root, f"{pending_release_version}-{datetime.date.today()}.md")
+    version_release_md_path = os.path.join(release_log_root, f"{prerelease_version}-{datetime.date.today()}.md")
     # w -> overwrite
     with open(file=version_release_md_path, mode="w", encoding="utf-8") as version_release_md_fs:
         version_release_md_fs.write(release_text + "\n")

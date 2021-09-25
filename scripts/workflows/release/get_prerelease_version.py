@@ -35,7 +35,7 @@ def extract_params(argv) -> Dict[str, Union[str, bool, int, float]]:
     return sh_params
 
 
-def get_pending_release_version(dev_log_root: str) -> str:
+def get_prerelease_version(dev_log_root: str) -> str:
     version_ordered_list = sorted(os.listdir(dev_log_root), key=lambda v: version.parse(v))
     version_pending_release = version_ordered_list[-1]
     return version_pending_release
@@ -44,7 +44,7 @@ def get_pending_release_version(dev_log_root: str) -> str:
 if __name__ == "__main__":
     params = extract_params(sys.argv[1:])
     try:
-        print(get_pending_release_version(dev_log_root=params["dev-log-root"]))
+        print(get_prerelease_version(dev_log_root=params["dev-log-root"]))
     except FileNotFoundError as err:
         print(f"dev_log not found, err -> {err}")
         sys.exit(1)
