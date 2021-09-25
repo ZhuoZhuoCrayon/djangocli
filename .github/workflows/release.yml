@@ -85,8 +85,8 @@ jobs:
       name: Create Tag
       run: |
         # 从上个步骤获取预发布版本号，拼接为标签名称
-        tag_name="${{ env.TAG_NAME_PREFIX }}${{ steps.generate-dev-log.outputs.prerelease_version }}"
-        release_log=${{ steps.generate-dev-log.outputs.release_log }}
+        tag_name=$( echo "${{ env.TAG_NAME_PREFIX }}${{ steps.generate-dev-log.outputs.prerelease_version }}" )
+        release_log=$( echo "${{ steps.generate-dev-log.outputs.release_log }}" )
         echo "🏷️ tag -> $tag_name will be created"
 
         # 创建并推送标签
@@ -118,19 +118,19 @@ jobs:
       run: |
 
         # 版本已发布，此时取出的预发布版本是最新版本
-        latest_version="${{ steps.generate-dev-log.outputs.prerelease_version }}"
+        latest_version=$( echo "${{ steps.generate-dev-log.outputs.prerelease_version }}" )
         echo "🔥️ latest_version -> $latest_version"
 
         next_version=$( python scripts/workflows/release/version_increment.py --version "$latest_version" )
         echo "⬇️ next_version -> $next_version"
 
         # 检出新开发分支
-        dev_branch_name="${next_version}${{ env.DEV_BRANCH_SUFFIX }}"
+        dev_branch_name=$( echo "${next_version}${{ env.DEV_BRANCH_SUFFIX }}" )
         echo "🌿 dev_branch_name -> $dev_branch_name"
         git checkout -b "$dev_branch_name"
 
         # 创建新开发版本的开发日志目录
-        next_version_dev_log_dir_path="${{ env.DEV_LOG_ROOT }}/$next_version"
+        next_version_dev_log_dir_path=$(echo "${{ env.DEV_LOG_ROOT }}/$next_version" )
         echo "📖 next_version_dev_log_dir_path -> $next_version_dev_log_dir_path"
         mkdir -p "$next_version_dev_log_dir_path"
         touch "$next_version_dev_log_dir_path/.gitkeep"
