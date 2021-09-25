@@ -1,4 +1,4 @@
-name: unittest & codecov
+name: Python unittest and codecov
 on: [push, pull_request]
 jobs:
   build:

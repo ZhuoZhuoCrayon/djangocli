@@ -18,7 +18,7 @@ Centos：https://yeasy.gitbook.io/docker_practice/install/centos
 
 ### 安装 Helm
 
-
+按照教程安装并启动 Helm： https://helm.sh/zh/docs/intro/install/
 
 
 
@@ -142,7 +142,7 @@ helm install --debug --dry-run djangocli -f values-private.yaml .
 ```shell
 cd ${PROJECT_DIR}/.helm/djangocli
 
-helm install 
+helm install djangocli -f values-private.yaml .
 ```
 
 ### 访问（以 minikube 为例）
