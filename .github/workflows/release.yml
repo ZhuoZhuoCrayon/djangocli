@@ -31,7 +31,7 @@ jobs:
       # release 名称前缀
       RELEASE_NAME_PREFIX: ""
       # 开发分支名称后缀
-      DEV_BRANCH_SUFFIX: "-rc"
+      DEV_BRANCH_SUFFIX: "rc"
 
     steps:
     - id: checkout
