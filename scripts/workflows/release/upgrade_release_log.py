@@ -105,4 +105,4 @@ if __name__ == "__main__":
     with open(file=version_release_md_path, mode="w", encoding="utf-8") as version_release_md_fs:
         version_release_md_fs.write(release_text + "\n")
 
-    print(release_text)
+    print(version_release_md_path)

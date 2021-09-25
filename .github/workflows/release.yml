@@ -59,7 +59,9 @@ jobs:
         echo "🔥 latest_version -> $latest_version"
 
         # 获取并更新发布日志
-        release_log=$( python scripts/workflows/release/upgrade_release_log.py -d ${{ env.DEV_LOG_ROOT }} -r ${{ env.RELEASE_LOG_ROOT }} )
+        release_log_path=$( python scripts/workflows/release/upgrade_release_log.py -d ${{ env.DEV_LOG_ROOT }} -r ${{ env.RELEASE_LOG_ROOT }} )
+        echo "🌟 release_log_path -> $release_log_path"
+        release_log=$( cat "$release_log_path" )
         echo "📒 release_log -> 👇👇👇 $release_log"
 
         # 找出 dev_log 最后活跃的版本号，该版本号为预发布版本
@@ -68,6 +70,9 @@ jobs:
         # 将 APP_DESC_YAML 中的版本更新为预发布版本
         python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op set --value "$prerelease_version"
 
+        # 获取发布日志路径
+        release_log_path=$( echo ${{ env.RELEASE_LOG_ROOT }}/$(ls -a ${{ env.RELEASE_LOG_ROOT }} | grep "$prerelease_version"-) )
+
         # 推送发布日志
         git config --global user.email "${{ env.GITHUB_USERNAME }}@users.noreply.github.com"
         git config --global user.name "${{ env.GITHUB_USERNAME }}"
@@ -75,9 +80,6 @@ jobs:
         git commit -m "docs: auto generate $prerelease_version release log"
         git push origin ${{ env.MAIN_BRANCH }}
         echo "✨️ main branch -> ${{ env.MAIN_BRANCH }} has been updated"
-
-        # 获取发布日志路径
-        release_log_path=$( echo ${{ env.RELEASE_LOG_ROOT }}/$(ls -a ${{ env.RELEASE_LOG_ROOT }} | grep "$prerelease_version"-) )
 
         # 设置输出
         echo "::set-output name=latest_version::$(echo $latest_version)"
