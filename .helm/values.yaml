@@ -43,7 +43,7 @@ backend:
     #  在镜像已经存在的情况下直接略过拉取镜像的操作，参考：https://kubernetes.io/zh/docs/concepts/containers/images/
     imagePullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.5.1"
+    tag: latest
 
 
   service:
@@ -78,7 +78,7 @@ celeryworker:
     repository: caicrayon/djangocli
     imagePullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.5.1"
+    tag: latest
 
 
 ## MariaDB chart configuration
