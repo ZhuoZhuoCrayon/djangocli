@@ -58,7 +58,7 @@ jobs:
         latest_version=$( python scripts/utils/op_yaml.py -f ${{ env.APP_DESC_YAML }} --keyword-path ${{ env.VERSION_KW_P }} --op get )
         echo "🔥 latest_version -> $latest_version"
 
-        # 获取并更新发布日志
+        # 获取发布日志路径并更新发布日志
         release_log_path=$( python scripts/workflows/release/upgrade_release_log.py -d ${{ env.DEV_LOG_ROOT }} -r ${{ env.RELEASE_LOG_ROOT }} )
         echo "🌟 release_log_path -> $release_log_path"
         release_log=$( cat "$release_log_path" )
