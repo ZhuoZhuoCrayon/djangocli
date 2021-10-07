@@ -15,11 +15,19 @@ repos:
   - repo: https://github.com/psf/black
     rev: 20.8b1
     hooks:
-    - id: black
-      language_version: python3.7
+      - id: black
+        language_version: python3.7
 
   - repo: https://github.com/pycqa/isort
     rev: 5.5.4
     hooks:
-    - id: isort
-      args: ["--profile", "black"]
+      - id: isort
+        args: ["--profile", "black"]
+
+  - repo: local
+    hooks:
+      - id: generate-dev-log
+        name: Generate dev log
+        entry: python scripts/workflows/pre-commit/generate_dev_log.py
+        language: system
+        stages: [commit-msg]
