@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-from multiprocessing import cpu_count
 
 from djangocli.conf.default_settings import *  # noqa
 from djangocli.constants import LogModule
 from djangocli.utils import string
+
+from .. import environ
 
 INSTALLED_APPS.extend(
     [
@@ -39,26 +40,23 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # 可控性能
-MAXIMUM_CONCURRENT_NUMBER = get_env("MAXIMUM_CONCURRENT_NUMBER", cpu_count(), _type=int)
+MAXIMUM_CONCURRENT_NUMBER = environ.MAXIMUM_CONCURRENT_NUMBER
 
 # cross
 ALLOWED_HOSTS = ["*"]
-
-# Redis
-DEFAULT_REDIS_PORT = 6379
 
 # Cache
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": string.get_redis_url(
-            host=get_env("DC_REDIS_HOST", "localhost"),
-            port=get_env("DC_REDIS_PORT", DEFAULT_REDIS_PORT, _type=int),
+            host=environ.DC_REDIS_HOST,
+            port=environ.DC_REDIS_PORT,
             db_index=0,
         ),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": get_env("DC_REDIS_PASSWORD", ""),
+            "PASSWORD": environ.DC_REDIS_PASSWORD,
             # 最大连接数量
             "CONNECTION_POOL_KWARGS": {"max_connections": 100},
         },
@@ -70,9 +68,9 @@ CACHES = {
 # Celery
 
 CELERY_BROKER_URL = string.get_redis_url(
-    password=get_env("DC_REDIS_PASSWORD", ""),
-    host=get_env("DC_REDIS_HOST", "localhost"),
-    port=get_env("DC_REDIS_PORT", DEFAULT_REDIS_PORT, _type=int),
+    password=environ.DC_REDIS_PASSWORD,
+    host=environ.DC_REDIS_HOST,
+    port=environ.DC_REDIS_PORT,
     db_index=1,
 )
 

@@ -116,7 +116,7 @@ def generate_dev_log(dev_log_root: str, commit_message: str) -> Dict[str, Any]:
     }
 
     with open(file=user_dev_log_yaml_path, mode="w", encoding="utf-8") as yaml_fs:
-        ruamel.yaml.round_trip_dump(yaml_info, yaml_fs, explicit_start=True)
+        ruamel.yaml.round_trip_dump(yaml_info, yaml_fs, explicit_start=True, block_seq_indent=2)
 
     subprocess.call(["git", "add", user_dev_log_yaml_path])
 
