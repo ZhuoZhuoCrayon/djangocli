@@ -86,14 +86,15 @@ def generate_envfile(environ_sh_path: str) -> str:
     return envfile_path
 
 
-def inject_env(environ_sh_path: str) -> None:
+def inject_env(environ_sh_path: str, keep_envfile: bool = False) -> None:
     """
     注入.sh环境变量
     :param environ_sh_path:
+    :param keep_envfile: 是否保留 .env 文件
     :return:
     """
     env_file_path = generate_envfile(environ_sh_path=environ_sh_path)
     dotenv.load_dotenv(dotenv_path=env_file_path)
 
-    if not get_env("DC_KEEP_ENVFILE", False, _type=bool):
+    if not keep_envfile:
         os.remove(env_file_path)
