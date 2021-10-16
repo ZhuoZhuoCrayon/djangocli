@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 
-from djangocli.core.env import get_env
+from .. import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -24,11 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env("SECRET_KEY")
+SECRET_KEY = environ.SECRET_KEY
 
-APP_NAME = get_env("APP_NAME")
+APP_NAME = environ.APP_NAME
 
-APP_VERSION = get_env("APP_VERSION")
+APP_VERSION = environ.APP_VERSION
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,13 +84,13 @@ WSGI_APPLICATION = "wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": APP_NAME,
-        "USER": get_env("DC_MYSQL_NAME", "root"),
-        "PASSWORD": get_env("DC_MYSQL_PASSWORD", ""),
-        "HOST": get_env("DC_MYSQL_HOST", "localhost"),
-        "PORT": get_env("DC_MYSQL_PORT", 3306, _type=int),
+        "NAME": environ.DC_MYSQL_NAME,
+        "USER": environ.DC_MYSQL_USER,
+        "PASSWORD": environ.DC_MYSQL_PASSWORD,
+        "HOST": environ.DC_MYSQL_HOST,
+        "PORT": environ.DC_MYSQL_PORT,
         "TEST": {
-            "NAME": f"{APP_NAME}_test",
+            "NAME": f"{environ.DC_MYSQL_USER}_test",
             "CHARSET": "utf8mb4",
             "COLLATION": "utf8mb4_unicode_ci",
         },
