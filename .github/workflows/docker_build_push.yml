@@ -14,6 +14,10 @@ jobs:
       # Docker仓库名称
       DOCKER_REPO_NAME: "djangocli"
     steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v2
+
       - id: set-up-qemu
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -34,5 +38,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:latest,${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_REPO_NAME }}/${{ github.event.release.name }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:latest,${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_REPO_NAME }}:${{ github.event.release.name }}
           file: scripts/services/k8s/images/app/Dockerfile
