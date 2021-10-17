@@ -26,3 +26,7 @@
 2021-10-17 10:33:
   docs:
     - "k8s 部署指引补充并添加首页引用 (closed #94)"
+
+2021-10-17 21:24:
+  optimization:
+    - "Helm 部署移除 environ.sh 依赖 (closed #121)"

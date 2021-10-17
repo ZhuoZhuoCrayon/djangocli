@@ -10,12 +10,12 @@ metadata:
 data:
   nginx.conf: |
     upstream djangocli {
-        server djangocli-backend:2170;
+        server {{ include "djangocli.backend.fullname" . }}:{{ .Values.backend.service.port }};
     }
 
     server {
 
-        listen 80;
+        listen {{ .Values.nginx.service.targetPort }};
         server_name _;
 
         location / {
@@ -27,6 +27,6 @@ data:
         }
 
         location /static/ {
-            alias /code/static/static/;
+            alias /code/static/;
         }
     }

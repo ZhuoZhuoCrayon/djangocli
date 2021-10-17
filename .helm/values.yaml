@@ -194,6 +194,7 @@ externalMariaDB:
   port: 3306
   username:
   password:
+  database:
 
 
 ## Redis chart configuration
