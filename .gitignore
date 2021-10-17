@@ -17,4 +17,6 @@ support-files/deploy/local/*
 support-files/deploy/prod/*
 support-files/deploy/stag/*
 
+support-files/deploy/*/environ*
+
 logs/

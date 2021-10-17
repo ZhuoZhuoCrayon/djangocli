@@ -8,11 +8,11 @@ db.sqlite3
 
 ## Python Part
 
-__pycache__/
+**/__pycache__/
+
 
 ## Extra Part
 .helm/
 djangocli/docs/
 logs/
-support-files/deploy/*
-!support-files/deploy/prod/
+support-files/deploy/*/environ*

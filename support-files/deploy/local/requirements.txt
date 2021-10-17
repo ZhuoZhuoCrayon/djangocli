@@ -1,0 +1,3 @@
+ipython
+
+-r ../dev/requirements.txt

@@ -33,10 +33,13 @@ spec:
         - name: {{ include "djangocli.nginx.fullname" . }}-collect
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
           imagePullPolicy: {{ .Values.backend.image.imagePullPolicy | default "IfNotPresent" | quote }}
-          command: ["cp", "-r", "/code/static/", "/code/staticfiles/"]
+          command: ["python", "manage.py", "collectstatic", "--noinput"]
+          env:
+            {{- include "djangocli.commonEnv" . | nindent 12 }}
           volumeMounts:
-            - mountPath: "/code/staticfiles/"
+            - mountPath: "/code/static/"
               name: static
+
       volumes:
         - name: static
           emptyDir: {}
