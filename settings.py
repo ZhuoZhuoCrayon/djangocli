@@ -3,12 +3,15 @@
 import os
 from pathlib import Path
 
-from djangocli import environ
-from djangocli.core.env import inject_env
+from djangocli.constants import EnvType
+from djangocli.core.env import get_env, inject_env
 from scripts.check_and_create_log_file import check_and_create_log_file
 
 # 部署环境
-ENV = environ.ENV
+ENV = get_env(key="DC_ENV", default=EnvType.LOCAL, _type=str)
+IS_INJECT_ENV = get_env(key="IS_INJECT_ENV", default=True, _type=bool)
+DC_KEEP_ENVFILE = get_env(key="DC_KEEP_ENVFILE", default=False, _type=bool)
+DC_DEFAULT_CONF_MODULE = get_env(key="DC_DEFAULT_CONF_MODULE", default="conf.default_settings", _type=str)
 
 # 项目根目录
 BASE_DIR = Path(__file__).resolve().parent
@@ -18,13 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent
 # -- 脚手架仅维护 environ.sh 👇👇👇
 # .sh在生产环境仍为主流，为了避免一套环境维护两种类型的文件，在该脚手架中仅维护environ.sh文件，通过动态生成.env文件注入Django运行环境
 # 在0.5.3 通过开放配置的形式，决定是否注入 env -> https://github.com/ZhuoZhuoCrayon/djangocli/issues/95
-if environ.IS_INJECT_ENV:
-    inject_env(
-        environ_sh_path=f"{BASE_DIR}/support-files/deploy/{ENV}/environ.sh", keep_envfile=environ.DC_KEEP_ENVFILE
-    )
+if IS_INJECT_ENV:
+    inject_env(environ_sh_path=f"{BASE_DIR}/support-files/deploy/{ENV}/environ.sh", keep_envfile=DC_KEEP_ENVFILE)
 
 # 默认配置文件模块，当相应环境的配置文件模块不存在时需要导入该默认配置
-DJANGO_CONF_MODULE = (environ.DC_DEFAULT_CONF_MODULE, f"conf.{ENV}")[os.path.exists(f"{BASE_DIR}/conf/{ENV}.py")]
+DJANGO_CONF_MODULE = (DC_DEFAULT_CONF_MODULE, f"conf.{ENV}")[os.path.exists(f"{BASE_DIR}/conf/{ENV}.py")]
 
 try:
     _module = __import__(DJANGO_CONF_MODULE, globals(), locals(), ["*"])

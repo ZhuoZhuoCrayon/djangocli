@@ -1,7 +1,8 @@
 # run in project root
 FROM python:3.7-alpine
 
-ENV DC_ENV=prod
+ARG DC_ENV=prod
+ENV DC_ENV ${DC_ENV}
 
 ADD . /code
 WORKDIR /code
@@ -15,10 +16,7 @@ WORKDIR /code
 RUN set -ex \
     && apk update && apk add musl-dev mariadb-dev gcc \
     && pip install --upgrade pip \
-    && pip install --no-cache-dir -r support-files/deploy/$DC_ENV/requirements.txt
-
-# 收集静态资源（包括 drf_yasg 等）
-RUN python manage.py collectstatic --noinput
+    && pip install --no-cache-dir -r support-files/deploy/${DC_ENV}/requirements.txt
 
 # docker run 启动时钩子
 ENTRYPOINT ["scripts/services/k8s/images/app/django-migrate-docker-entrypoint.sh"]

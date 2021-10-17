@@ -76,6 +76,14 @@ Return the Redis host
 {{- define "djangocli.commonEnv" -}}
 - name: DC_ENV
   value: prod
+- name: IS_INJECT_ENV
+  value: "False"
+
+- name: DC_MYSQL_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "djangocli.secret.mariadb.name" . }}
+      key: database
 - name: DC_MYSQL_HOST
   valueFrom:
     secretKeyRef:
@@ -112,6 +120,7 @@ Return the Redis host
     secretKeyRef:
       name: {{ include "djangocli.secret.redis.name" . }}
       key: password
+
 - name: SECRET_KEY
   valueFrom:
     secretKeyRef:
@@ -127,6 +136,7 @@ Return the Redis host
     secretKeyRef:
       name: {{ include "djangocli.secret.app.name" . }}
       key: appVersion
+
 - name: DJANGO_SUPERUSER_PASSWORD
   valueFrom:
     secretKeyRef:
