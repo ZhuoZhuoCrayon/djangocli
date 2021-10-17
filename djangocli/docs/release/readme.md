@@ -33,3 +33,9 @@
 * k8s 部署指引补充并添加首页引用 (closed #94)
 ### optimization: 
 * Helm 部署移除 environ.sh 依赖 (closed #121)
+
+## 0.5.4 - 2021-10-17 
+
+### bugfix: 
+* release 创建后未按预期推送镜像 (fixed #126)
+* 修复自动生成 dev log 提交未声明生成日志时报错的问题 (fixed #124)
