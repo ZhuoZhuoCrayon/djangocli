@@ -3,6 +3,7 @@
 .tmp/
 .vscode/
 db.sqlite3
+*.DS_Store
 
 ## Python Part
 

@@ -31,7 +31,7 @@ jobs:
       # release 名称前缀
       RELEASE_NAME_PREFIX: ""
       # 开发分支名称后缀
-      DEV_BRANCH_SUFFIX: "rc"
+      DEV_BRANCH_SUFFIX: "-rc"
 
     steps:
     - id: checkout
@@ -114,8 +114,16 @@ jobs:
         tag_name: ${{ steps.create-tag.outputs.tag_name }}
         release_name: ${{ env.RELEASE_NAME_PREFIX }}${{ steps.generate-dev-log.outputs.prerelease_version }}
         body_path: ${{ steps.generate-dev-log.outputs.release_log_path }}
-        draft: false
+        draft: true
         prerelease: false
+
+    - id: publish-release
+      name: Publish release
+      uses: eregon/publish-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ steps.create-release.outputs.id }}
 
     - id: start-new-version
       name: Start new version
