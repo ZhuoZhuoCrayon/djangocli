@@ -44,3 +44,8 @@
 
 ### bugfix: 
 * 自动推送镜像异常 (fixed #131)
+
+## 0.5.6 - 2021-10-17 
+
+### bugfix: 
+* GITHUB_TOKEN can not trigger other workflow (fixed #134)
