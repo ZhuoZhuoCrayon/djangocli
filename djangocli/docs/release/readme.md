@@ -49,3 +49,8 @@
 
 ### bugfix: 
 * GITHUB_TOKEN can not trigger other workflow (fixed #134)
+
+## 0.5.7 - 2021-10-17 
+
+### bugfix: 
+* authorization status: 401: authorization failed(fixed #137)
