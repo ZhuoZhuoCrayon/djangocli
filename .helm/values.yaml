@@ -28,13 +28,13 @@ imagePullSecrets: []
 #  email:
 
 appCredentials:
-  secretKey:
+  secretKey: ""
   appName: "django-cli"
   appVersion: "latest"
   superuser:
-     username:
-     password:
-     email:
+     username: ""
+     password: ""
+     email: ""
 
 
 backend:

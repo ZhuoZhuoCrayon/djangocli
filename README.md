@@ -1,11 +1,11 @@
 # djangocli
 ️🔧 djangocli is the standard tooling for Django development based on DRF.
 
-[![Travis-CI Build Status](https://travis-ci.com/ZhuoZhuoCrayon/djangocli.svg?branch=0.5.x)](https://travis-ci.com/ZhuoZhuoCrayon/djangocli)
-[![Coverage Status](https://codecov.io/gh/ZhuoZhuoCrayon/djangocli/branch/0.5.x/graph/badge.svg)](https://app.codecov.io/gh/ZhuoZhuoCrayon/djangocli/branch/0.5.x)
-![unittest & codecov](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/python_unittest_and_codecov.yml/badge.svg?branch=0.5.x)
-![Docker build & push](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/docker_build_push.yml/badge.svg?branch=0.5.x)
-![Auto version release](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/auto_version_release.yml/badge.svg?branch=0.5.x)
+[![Coverage Status](https://codecov.io/gh/ZhuoZhuoCrayon/djangocli/graph/badge.svg)](https://app.codecov.io/gh/ZhuoZhuoCrayon/djangocli)
+[![Python unittest and codecov](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/python_unittest_and_codecov.yml/badge.svg)](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/python_unittest_and_codecov.yml)
+[![Create release](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/release_2_create_release.yml/badge.svg)](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/release_2_create_release.yml)
+[![Docker build and push](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/docker_build_push.yml/badge.svg)](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/docker_build_push.yml)
+[![Release Helm Charts](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/release_helm_charts.yml/badge.svg)](https://github.com/ZhuoZhuoCrayon/djangocli/actions/workflows/release_helm_charts.yml)
 
 ![Release](https://badgen.net/github/release/ZhuoZhuoCrayon/djangocli)
 ![Latest tag](https://badgen.net/github/tag/ZhuoZhuoCrayon/djangocli)
