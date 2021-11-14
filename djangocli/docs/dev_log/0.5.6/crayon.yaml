@@ -1,4 +1,0 @@
----
-2021-10-18 00:29:
-  bugfix:
-    - "GITHUB_TOKEN can not trigger other workflow (fixed #134)"

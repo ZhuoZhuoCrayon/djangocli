@@ -1,0 +1,181 @@
+name: Release Helm Charts
+# 如果不考虑异库提交 release 以及 维护统一的 Helm Charts，也可以考虑使用 chart-releaser: https://github.com/helm/chart-releaser
+# Helm 官方也提供了 cr 的 actions: https://github.com/helm/chart-releaser-action
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      # 构建环境的Python版本
+      PYTHON_VERSION: "3.7"
+      # github 提交用户名
+      GITHUB_USERNAME: "github-actions"
+      # Chart目录
+      CHART_PATH: ".helm"
+      # helms charts 仓库名称
+      CHARTS_REPO_NAME: "helm-charts"
+      # helms charts 仓库归属人
+      CHARTS_REPO_OWNER: "ZhuoZhuoCrayon"
+      # helms charts 仓库地址
+      CHARTS_REPO_URL: "https://zhuozhuocrayon.github.io/helm-charts"
+
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v2
+
+      - id: set-up-python
+        name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - id: install-requirements
+        name: Install requirements
+        run: |
+          pip install PyYAML
+          pip install packaging
+          pip install ruamel.yaml
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - id: set-env
+        name: Set env
+        run: |
+
+          # 测试 Helm 是否启动
+          helm version
+
+          chart_yaml_path=${{ env.CHART_PATH }}/Chart.yaml
+          chart_name=$( python scripts/workflows/release/op_yaml.py -f $chart_yaml_path --keyword-path name --op get )
+          chart_version=$( python scripts/workflows/release/op_yaml.py -f $chart_yaml_path --keyword-path version --op get )
+
+          # 默认提交者邮箱
+          echo "GITHUB_EMAIL=${{ env.GITHUB_USERNAME }}@users.noreply.github.com" >> $GITHUB_ENV
+
+          # 通过事件获取release相关信息
+          # 参考：https://stackoverflow.com/questions/65521101/
+          # 参考：https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
+          # release 访问地址
+          echo "RELEASE_HTML_URL=${{ github.event.release.html_url }}" >> $GITHUB_ENV
+          # release 上传地址
+          echo "RELEASE_UPLOAD_URL=${{ github.event.release.upload_url }}" >> $GITHUB_ENV
+
+          # Chart.yaml 路径
+          echo "CHART_YAML_PATH=$chart_yaml_path" >> $GITHUB_ENV
+          # Chart 名称
+          echo "CHART_NAME=$chart_name" >> $GITHUB_ENV
+          # Chart 版本号
+          echo "CHART_VERSION=$chart_version" >> $GITHUB_ENV
+          # 默认的 Helm Chart 包名
+          echo "DEFAULT_HELM_PKG_NAME=${chart_name}-${chart_version}.tgz" >> $GITHUB_ENV
+          # Helm Chart 包名
+          echo "HELM_PKG_NAME=${chart_name}-helm-${chart_version}.tgz" >> $GITHUB_ENV
+          # 临时打包目录
+          echo "TMP_CHARTS_DIR=/tmp/$chart_name/charts" >> $GITHUB_ENV
+
+      - name: Configure Git
+        run: |
+          git config user.name "${{ env.GITHUB_USERNAME }}"
+          git config user.email "${{ env.GITHUB_EMAIL }}"
+
+      - id: helm-package
+        name: Helm package
+        run: |
+          # 初始化临时打包目录
+          rm -rf ${{ env.TMP_CHARTS_DIR }} & mkdir -p ${{ env.TMP_CHARTS_DIR }}
+          # Chart 打包
+          helm package ${{ env.CHART_PATH }} -u -d ${{ env.TMP_CHARTS_DIR }}
+
+          # Chart 重命名
+          mv ${{ env.TMP_CHARTS_DIR }}/${{ env.DEFAULT_HELM_PKG_NAME }} ${{ env.TMP_CHARTS_DIR }}/${{ env.HELM_PKG_NAME }}
+
+      - id: upload-helm-chart-package
+        name: Upload Helm Chart package
+        # 参考：https://github.com/actions/upload-release-asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        with:
+          upload_url: ${{ env.RELEASE_UPLOAD_URL }}
+          asset_path: ${{ env.TMP_CHARTS_DIR }}/${{ env.HELM_PKG_NAME }}
+          asset_name: ${{ env.HELM_PKG_NAME }}
+          asset_content_type: application/octet-stream
+
+      - id: update-helm-charts-repo
+        name: Update Helm charts repo
+        run: |
+          git clone https://github.com/${{ env.CHARTS_REPO_OWNER }}/${{ env.CHARTS_REPO_NAME }}.git
+
+          # 兼容初始化创建文件
+          mkdir -p ${{ env.CHARTS_REPO_NAME }}/${{ env.CHART_NAME }}/src
+
+          # 覆盖更新helm源码
+          cp -rf .helm/* ${{ env.CHARTS_REPO_NAME }}/${{ env.CHART_NAME }}/src/
+
+          # 获取 Chart包 下载目录
+          chart_download_url=${{ steps.upload-helm-chart-package.outputs.browser_download_url }}
+          echo "⬇️ chart_download_url -> $chart_download_url"
+          chart_download_root=$( echo "$chart_download_url" | sed "s|${{ env.HELM_PKG_NAME }}||" )
+          echo "📒 chart_download_root -> $chart_download_root"
+
+          # 遍历字符串列表，参考：https://stackoverflow.com/questions/8880603/loop-through-an-array-of-strings-in-bash
+          declare -a index_yaml_roots=("${{ env.CHARTS_REPO_NAME }}" "${{ env.CHARTS_REPO_NAME }}/${{ env.CHART_NAME }}")
+          # 更新 index.yaml
+          for index_yaml_root in "${index_yaml_roots[@]}"
+          do
+            # 初始化 index.yaml
+            if [ ! -f $index_yaml_root/index.yaml ]; then
+              # 兼容 index.yaml 存在 charts 包的情况，补充子路径 child_dir
+              child_path=$( echo "$index_yaml_root" | sed "s|${{ env.CHARTS_REPO_NAME }}/||" )
+              helm repo index $index_yaml_root --url ${{ env.CHARTS_REPO_URL }}/$child_path
+            fi
+
+            # 基于出包路径生成 index.yaml 并和 原index.yaml 合并
+            helm repo index ${{ env.TMP_CHARTS_DIR }} --url $chart_download_root --merge $index_yaml_root/index.yaml
+            # 更新 原index.yaml
+            mv -f ${{ env.TMP_CHARTS_DIR }}/index.yaml $index_yaml_root/index.yaml
+          done
+
+      - id: update-charts-repo-index-yaml
+        name: Update charts repo index yaml
+        # refer: https://github.com/marketplace/actions/push-a-file-to-another-repository
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PAT }}
+        with:
+          source_file: ${{ env.CHARTS_REPO_NAME }}/index.yaml
+          destination_repo: ${{ env.CHARTS_REPO_OWNER }}/${{ env.CHARTS_REPO_NAME }}
+          user_email: ${{ env.GITHUB_EMAIL }}
+          user_name: ${{ env.GITHUB_USERNAME }}
+          destination_branch: main
+          commit_message: "minor: update index.yaml triggered by ${{ env.RELEASE_HTML_URL }}"
+
+      - id: update-chart-src
+        name: Update Chart src
+        # refer: https://github.com/marketplace/actions/push-directory-to-another-repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PAT }}
+        with:
+          source-directory: ${{ env.CHARTS_REPO_NAME }}/${{ env.CHART_NAME }}
+          target-directory: ${{ env.CHART_NAME }}
+          destination-github-username: ${{ env.CHARTS_REPO_OWNER }}
+          destination-repository-name: ${{ env.CHARTS_REPO_NAME }}
+          user-email: ${{ env.GITHUB_EMAIL }}
+          user-name: ${{ env.GITHUB_USERNAME }}
+          target-branch: main
+          commit-message: "minor: update chart src triggered by ${{ env.RELEASE_HTML_URL }}"
+
+      - id: celebrate
+        name: Celebrate
+        run: |
+          echo "🎉 Worth celebrating"
+          echo "🍻 All steps are successfully completed"
+          echo "👋 Goodbye!"
